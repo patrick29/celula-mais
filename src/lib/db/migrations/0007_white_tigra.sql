@@ -1,0 +1,1 @@
+ALTER TABLE "meetings" ADD COLUMN "photo_url" text;
