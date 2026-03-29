@@ -2,9 +2,14 @@ import { CellGroupForm } from "../components/cell-group-form";
 import { getLeadersForSelect } from "@/actions/cell-groups";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { redirect } from "next/navigation";
 
 export default async function NewCellGroupPage() {
-  const { data: leaders } = await getLeadersForSelect();
+  const { data: leaders, error } = await getLeadersForSelect();
+
+  if (error) {
+    redirect(`/cells?error=${encodeURIComponent("Erro ao carregar opções de liderança.")}`);
+  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">

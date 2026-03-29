@@ -1,9 +1,16 @@
 import Link from "next/link";
 import { getCellGroups } from "@/actions/cell-groups";
 import { CellGroupsTable } from "./components/cell-groups-table";
-import { Plus } from "lucide-react";
+import { Plus, AlertCircle } from "lucide-react";
 
-export default async function CellGroupsPage() {
+export default async function CellGroupsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = await searchParams;
+  const urlError = params.error as string;
+
   const { data: cellGroups, error } = await getCellGroups();
 
   return (
@@ -24,9 +31,17 @@ export default async function CellGroupsPage() {
         </Link>
       </div>
 
+      {urlError && (
+        <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-md flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+          <p className="text-sm font-medium">{urlError}</p>
+        </div>
+      )}
+
       {error ? (
-        <div className="p-4 bg-red-50 text-red-600 rounded-md">
-          Ocorreu um erro ao carregar as células: {error}
+        <div className="p-4 bg-red-50 text-red-600 rounded-md flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          <p className="text-sm font-medium">Ocorreu um erro ao carregar as células: {error}</p>
         </div>
       ) : (
         <CellGroupsTable cellGroups={cellGroups || []} />

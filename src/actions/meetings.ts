@@ -6,39 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { eq, and, ilike, desc, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { revalidatePath } from "next/cache";
+import { getAuthUserContext } from "@/lib/auth-context";
 
-async function getAuthUserContext() {
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !authUser) {
-    const [fallbackUser] = await db.select().from(users).limit(1);
-
-    if (!fallbackUser) {
-      throw new Error("Unauthorized and no fallback user found. Please seed the database first.");
-    }
-
-    return {
-      authUser: { id: fallbackUser.id } as any,
-      dbUser: fallbackUser,
-    };
-  }
-
-  const [dbUser] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, authUser.id))
-    .limit(1);
-
-  if (!dbUser) {
-    throw new Error("User not found in database");
-  }
-
-  return { authUser, dbUser };
-}
 
 export type GetMeetingsParams = {
   search?: string;
@@ -107,8 +76,8 @@ export async function getMeetingById(id: string) {
     const p2 = alias(persons, "p2");
     const p3 = alias(persons, "p3");
 
-    const [meeting] = await db
-      .select({
+    const [meetingResult, attendancesResult] = await Promise.all([
+      db.select({
         id: meetings.id,
         meetingDate: meetings.meetingDate,
         topic: meetings.topic,
@@ -136,23 +105,24 @@ export async function getMeetingById(id: string) {
       .where(
         and(eq(meetings.id, id), eq(cellGroups.churchId, dbUser.churchId))
       )
-      .limit(1);
-
-    if (!meeting) {
-      return { data: null, error: "Reunião não encontrada" };
-    }
-
-    const attendances = await db
-      .select({
+      .limit(1),
+      db.select({
         personId: meetingAttendance.personId,
         status: meetingAttendance.status,
         fullName: persons.fullName,
       })
       .from(meetingAttendance)
       .innerJoin(persons, eq(meetingAttendance.personId, persons.id))
-      .where(eq(meetingAttendance.meetingId, id));
+      .where(eq(meetingAttendance.meetingId, id))
+    ]);
 
-    return { data: { ...meeting, attendances }, error: null };
+    const [meeting] = meetingResult;
+
+    if (!meeting) {
+      return { data: null, error: "Reunião não encontrada" };
+    }
+
+    return { data: { ...meeting, attendances: attendancesResult }, error: null };
   } catch (error: any) {
     console.error("Error fetching meeting by id:", error);
     return { data: null, error: error.message };
@@ -180,29 +150,29 @@ export async function getCellGroupMembers(cellGroupId: string) {
   try {
     const { dbUser } = await getAuthUserContext();
 
-    // 1. Get cell group and its leadership
-    const [cellGroup] = await db
-      .select({
+    // 1 & 2. Get cell group, its leadership, and explicit members in parallel
+    const [cellGroupResult, members] = await Promise.all([
+      db.select({
         leaderId: cellGroups.leaderId,
         coLeaderId: cellGroups.coLeaderId,
         hostId: cellGroups.hostId,
       })
       .from(cellGroups)
       .where(and(eq(cellGroups.id, cellGroupId), eq(cellGroups.churchId, dbUser.churchId)))
-      .limit(1);
-
-    if (!cellGroup) return { data: [], error: "Célula não encontrada" };
-
-    // 2. Get explicit cell members
-    const members = await db
-      .select({
+      .limit(1),
+      db.select({
         id: persons.id,
         fullName: persons.fullName,
       })
       .from(cellMembers)
       .innerJoin(persons, eq(cellMembers.personId, persons.id))
       .where(eq(cellMembers.cellGroupId, cellGroupId))
-      .orderBy(persons.fullName);
+      .orderBy(persons.fullName)
+    ]);
+
+    const [cellGroup] = cellGroupResult;
+
+    if (!cellGroup) return { data: [], error: "Célula não encontrada" };
 
     // 3. Get leadership persons details
     const leadershipIds = [cellGroup.leaderId, cellGroup.coLeaderId, cellGroup.hostId].filter(
@@ -237,12 +207,12 @@ export async function getCellGroupMembers(cellGroupId: string) {
 export async function createMeeting(data: {
   cellGroupId: string;
   meetingDate: string;
-  topic?: string;
-  initialPrayer?: string;
-  finalPrayer?: string;
-  responsibleForReflection?: string;
-  notes?: string;
-  photoUrl?: string;
+  topic?: string | null;
+  initialPrayer?: string | null;
+  finalPrayer?: string | null;
+  responsibleForReflection?: string | null;
+  notes?: string | null;
+  photoUrl?: string | null;
   memberCount?: number;
   visitorCount?: number;
   childrenCount?: number;
@@ -316,12 +286,12 @@ export async function updateMeeting(
   data: {
     cellGroupId?: string;
     meetingDate?: string;
-    topic?: string;
-    initialPrayer?: string;
-    finalPrayer?: string;
-    responsibleForReflection?: string;
-    notes?: string;
-    photoUrl?: string;
+    topic?: string | null;
+    initialPrayer?: string | null;
+    finalPrayer?: string | null;
+    responsibleForReflection?: string | null;
+    notes?: string | null;
+    photoUrl?: string | null;
     memberCount?: number;
     visitorCount?: number;
     childrenCount?: number;

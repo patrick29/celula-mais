@@ -1,7 +1,13 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Users, UserIcon, Calendar, PieChart, LayoutDashboard, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function Sidebar() {
+  const pathname = usePathname();
+
   const routes = [
     {
       label: "Dashboard",
@@ -38,23 +44,33 @@ export function Sidebar() {
         </h1>
       </div>
       <div className="flex flex-col w-full flex-1 mt-4">
-        {routes.map((route) => (
-          <Link
-            key={route.href}
-            href={route.href}
-            className="flex items-center gap-x-2 text-slate-500 text-sm font-medium px-6 py-4 hover:text-slate-900 hover:bg-slate-100/50 transition-all rounded-r-full mr-4"
-          >
-            <route.icon className="h-5 w-5" />
-            {route.label}
-          </Link>
-        ))}
+        {routes.map((route) => {
+          const isActive = pathname === route.href || (route.href !== "/" && pathname?.startsWith(route.href));
+          
+          return (
+            <Link
+              key={route.href}
+              href={route.href}
+              className={cn(
+                "flex items-center gap-x-2 text-slate-500 text-sm font-medium px-6 py-4 hover:text-slate-900 hover:bg-slate-100/50 transition-all rounded-r-full mr-4 border-l-4 border-transparent",
+                isActive && "text-blue-600 bg-blue-50/80 hover:bg-blue-100/50 border-blue-600"
+              )}
+            >
+              <route.icon className={cn("h-5 w-5", isActive && "text-blue-600")} />
+              {route.label}
+            </Link>
+          );
+        })}
       </div>
       <div className="mt-auto px-6">
         <Link
           href="/settings"
-          className="flex items-center gap-x-2 text-slate-500 hover:text-slate-900 text-sm font-medium py-4 transition-all"
+          className={cn(
+            "flex items-center gap-x-2 text-slate-500 hover:text-slate-900 text-sm font-medium py-4 transition-all border-l-4 border-transparent",
+            pathname === "/settings" && "text-blue-600"
+          )}
         >
-          <Settings className="h-5 w-5" />
+          <Settings className={cn("h-5 w-5", pathname === "/settings" && "text-blue-600")} />
           Configurações
         </Link>
       </div>

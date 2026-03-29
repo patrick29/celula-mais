@@ -10,6 +10,21 @@ import { Save, Loader2, Plus, Trash2, Calendar } from "lucide-react";
 import Link from "next/link";
 import { persons } from "@/lib/db/schema";
 import { ChurchEventDialog } from "./church-event-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Controller } from "react-hook-form";
+import { cn } from "@/lib/utils";
 
 type PersonOption = { id: string; fullName: string };
 
@@ -137,7 +152,7 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
         churchId: "",
         cellGroupId: null,
         // Se modo "select" mas sem id selecionado, nulifica
-        spouseId: spouseMode === "select" ? (data.spouseId || null) : null,
+        spouseId: spouseMode === "select" ? (data.spouseId === "none" ? null : (data.spouseId || null)) : null,
         spouseQuickName: spouseMode === "quick" ? data.spouseQuickName : undefined,
         spouseAttends: spouseMode === "quick" ? data.spouseAttends : undefined,
         churchLifeEvents: data.churchLifeEvents?.map((evt) => {
@@ -162,13 +177,10 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
     }
   }
 
-  const inputCls =
-    "w-full flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50";
-  const selectCls =
-    "w-full flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600";
+  // Styles removed: using shadcn components directly
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+    <div className="max-w-4xl mx-auto">
       <form
         onSubmit={handleSubmit(onSubmit, (formErrors) => {
           console.error("Validation errors:", JSON.stringify(formErrors, null, 2));
@@ -176,271 +188,388 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
         className="space-y-8"
       >
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
+          <div className="p-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-md text-sm">
             {error}
           </div>
         )}
-        {Object.keys(errors).length > 0 && (
-          <div className="p-4 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-md text-sm">
-            <p className="font-medium mb-1">Erro de validação. Verifique os campos:</p>
-            <ul className="list-disc list-inside space-y-0.5">
-              {Object.entries(errors).map(([field, err]) => (
-                <li key={field}>
-                  {field}: {(err as any)?.message || JSON.stringify(err)}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-8">
           {/* ── Dados Pessoais ── */}
-          <div className="space-y-4 md:col-span-2">
-            <h3 className="font-semibold text-slate-900 border-b pb-2">Dados Pessoais</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-slate-900">
+                Dados Pessoais
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Nome Completo *</label>
-                <input {...register("fullName")} className={inputCls} placeholder="João da Silva" />
-                {errors.fullName && <p className="text-xs text-red-500">{errors.fullName.message}</p>}
+                <Label htmlFor="fullName">Nome Completo *</Label>
+                <Input
+                  id="fullName"
+                  {...register("fullName")}
+                  placeholder="João da Silva"
+                  className={errors.fullName ? "border-destructive focus-visible:ring-destructive" : ""}
+                />
+                {errors.fullName && (
+                  <p className="text-xs font-medium text-destructive">
+                    {errors.fullName.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Telefone (WhatsApp)</label>
-                <input {...register("phone")} className={inputCls} placeholder="(11) 98765-4321" />
+                <Label htmlFor="phone">Telefone (WhatsApp)</Label>
+                <Input
+                  id="phone"
+                  {...register("phone")}
+                  placeholder="(11) 98765-4321"
+                />
+                {errors.phone && (
+                  <p className="text-xs font-medium text-destructive">
+                    {errors.phone.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Data de Nascimento</label>
-                <input type="date" {...register("birthDate")} className={selectCls} />
+                <Label htmlFor="birthDate">Data de Nascimento</Label>
+                <Input
+                  id="birthDate"
+                  type="date"
+                  {...register("birthDate")}
+                />
+                {errors.birthDate && (
+                  <p className="text-xs font-medium text-destructive">
+                    {errors.birthDate.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Gênero</label>
-                <select {...register("gender")} className={selectCls}>
-                  <option value="">Selecione...</option>
-                  <option value="MALE">Masculino</option>
-                  <option value="FEMALE">Feminino</option>
-                </select>
+                <Label htmlFor="gender">Gênero</Label>
+                <Controller
+                  control={control}
+                  name="gender"
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger id="gender">
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MALE">Masculino</SelectItem>
+                        <SelectItem value="FEMALE">Feminino</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.gender && (
+                  <p className="text-xs font-medium text-destructive">
+                    {errors.gender.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Estado Civil</label>
-                <select {...register("maritalStatus")} className={selectCls}>
-                  <option value="">Selecione...</option>
-                  <option value="SOLTEIRO">Solteiro(a)</option>
-                  <option value="CASADO">Casado(a)</option>
-                  <option value="DIVORCIADO">Divorciado(a)</option>
-                  <option value="VIUVO">Viúvo(a)</option>
-                </select>
+                <Label htmlFor="maritalStatus">Estado Civil</Label>
+                <Controller
+                  control={control}
+                  name="maritalStatus"
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger id="maritalStatus">
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="SOLTEIRO">Solteiro(a)</SelectItem>
+                        <SelectItem value="CASADO">Casado(a)</SelectItem>
+                        <SelectItem value="DIVORCIADO">Divorciado(a)</SelectItem>
+                        <SelectItem value="VIUVO">Viúvo(a)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.maritalStatus && (
+                  <p className="text-xs font-medium text-destructive">
+                    {errors.maritalStatus.message}
+                  </p>
+                )}
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* ── Cônjuge (condicional) ── */}
           {showSpouse && (
-            <div className="space-y-4 md:col-span-2 mt-2">
-              <h3 className="font-semibold text-slate-900 border-b pb-2">Cônjuge</h3>
-
-              {/* Toggle modo */}
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSpouseMode("select");
-                    setValue("spouseQuickName", "");
-                  }}
-                  className={`px-4 py-1.5 text-sm rounded-full font-medium transition-colors border ${
-                    spouseMode === "select"
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
-                  }`}
-                >
-                  Já cadastrado(a)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSpouseMode("quick");
-                    setValue("spouseId", null);
-                  }}
-                  className={`px-4 py-1.5 text-sm rounded-full font-medium transition-colors border ${
-                    spouseMode === "quick"
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
-                  }`}
-                >
-                  Cadastrar agora
-                </button>
-              </div>
-
-              {spouseMode === "select" ? (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">
-                    Selecionar cônjuge
-                  </label>
-                  <select {...register("spouseId")} className={selectCls}>
-                    <option value="">— Nenhum —</option>
-                    {allPersons
-                      .filter((p) => p.id !== member?.id)
-                      .map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.fullName}
-                        </option>
-                      ))}
-                  </select>
-                  {allPersons.length === 0 && (
-                    <p className="text-xs text-slate-500">
-                      Nenhum outro membro cadastrado ainda.
-                    </p>
-                  )}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-slate-900">
+                  Cônjuge
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Toggle modo */}
+                <div className="flex bg-slate-100 p-1 rounded-lg w-fit">
+                  <Button
+                    type="button"
+                    variant={spouseMode === "select" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => {
+                      setSpouseMode("select");
+                      setValue("spouseQuickName", "");
+                    }}
+                    className="rounded-md"
+                  >
+                    Já cadastrado(a)
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={spouseMode === "quick" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => {
+                      setSpouseMode("quick");
+                      setValue("spouseId", null);
+                    }}
+                    className="rounded-md"
+                  >
+                    Cadastrar agora
+                  </Button>
                 </div>
-              ) : (
-                <div className="bg-slate-50 border border-slate-200 rounded-md p-4 space-y-3">
-                  <p className="text-xs text-slate-500">
-                    Preencha apenas o nome para cadastrar o cônjuge rapidamente.
-                  </p>
+
+                {spouseMode === "select" ? (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">
-                      Nome do cônjuge
-                    </label>
-                    <input
-                      {...register("spouseQuickName")}
-                      className={inputCls}
-                      placeholder="Maria da Silva"
+                    <Label htmlFor="spouseId">Selecionar cônjuge</Label>
+                    <Controller
+                      control={control}
+                      name="spouseId"
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} value={field.value || ""}>
+                          <SelectTrigger id="spouseId">
+                            <SelectValue placeholder="— Nenhum —" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">— Nenhum —</SelectItem>
+                            {allPersons
+                              .filter((p) => p.id !== member?.id)
+                              .map((p) => (
+                                <SelectItem key={p.id} value={p.id}>
+                                  {p.fullName}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     />
+                    {errors.spouseId && (
+                      <p className="text-xs font-medium text-destructive">
+                        {errors.spouseId.message}
+                      </p>
+                    )}
+                    {allPersons.length === 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        Nenhum outro membro cadastrado ainda.
+                      </p>
+                    )}
                   </div>
-                  <label className="flex items-center gap-2 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      {...register("spouseAttends")}
-                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                      defaultChecked
-                    />
-                    <span className="text-sm text-slate-700">Frequenta a igreja</span>
-                  </label>
-                  <p className="text-xs text-slate-400">
-                    Desmarque se o cônjuge não frequenta a igreja.
-                  </p>
-                </div>
-              )}
-            </div>
+                ) : (
+                  <div className="bg-slate-50 border border-slate-200 rounded-md p-4 space-y-4">
+                    <p className="text-xs text-muted-foreground">
+                      Preencha apenas o nome para cadastrar o cônjuge rapidamente.
+                    </p>
+                    <div className="space-y-2">
+                      <Label htmlFor="spouseQuickName">Nome do cônjuge</Label>
+                      <Input
+                        id="spouseQuickName"
+                        {...register("spouseQuickName")}
+                        placeholder="Maria da Silva"
+                      />
+                      {errors.spouseQuickName && (
+                        <p className="text-xs font-medium text-destructive">
+                          {errors.spouseQuickName.message}
+                        </p>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Controller
+                        control={control}
+                        name="spouseAttends"
+                        render={({ field }) => (
+                          <Checkbox
+                            id="spouseAttends"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        )}
+                      />
+                      <Label
+                        htmlFor="spouseAttends"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Frequenta a igreja
+                      </Label>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Desmarque se o cônjuge não frequenta a igreja.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           )}
 
           {/* ── Endereço ── */}
-          <div className="space-y-4 md:col-span-2 mt-4">
-            <h3 className="font-semibold text-slate-900 border-b pb-2">Endereço</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-slate-900">
+                Endereço
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Endereço Completo</label>
-                <input
+                <Label htmlFor="addressLine">Endereço Completo</Label>
+                <Input
+                  id="addressLine"
                   {...register("addressLine")}
-                  className={inputCls}
                   placeholder="Rua da Esperança, 123"
                 />
+                {errors.addressLine && (
+                  <p className="text-xs font-medium text-destructive">
+                    {errors.addressLine.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Bairro</label>
-                <input {...register("neighborhood")} className={inputCls} placeholder="Centro" />
+                <Label htmlFor="neighborhood">Bairro</Label>
+                <Input
+                  id="neighborhood"
+                  {...register("neighborhood")}
+                  placeholder="Centro"
+                />
+                {errors.neighborhood && (
+                  <p className="text-xs font-medium text-destructive">
+                    {errors.neighborhood.message}
+                  </p>
+                )}
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* ── Vida na Igreja ── */}
-          <div className="space-y-4 md:col-span-2 mt-4">
-            <div className="flex items-center justify-between border-b pb-2">
-              <h3 className="font-semibold text-slate-900">Vida na Igreja</h3>
-              <button
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-semibold text-slate-900">
+                Vida na Igreja
+              </CardTitle>
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => setIsEventDialogOpen(true)}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-all border border-blue-200"
+                className="gap-1.5"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-4 h-4" />
                 Adicionar Evento
-              </button>
-            </div>
-
-            <div className="space-y-4">
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">
-                  Histórico de Eventos ({fields.length})
-                </label>
+                <Label>Histórico de Eventos ({fields.length})</Label>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {fields.map((field: any, index) => (
                     <div
                       key={field.id}
-                      className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200 shadow-sm"
+                      className="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200 transition-colors hover:bg-slate-100"
                     >
                       <input type="hidden" {...register(`churchLifeEvents.${index}.type` as const)} />
                       <input type="hidden" {...register(`churchLifeEvents.${index}.date` as const)} />
                       <input type="hidden" {...register(`churchLifeEvents.${index}.notes` as const)} />
                       
                       <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-slate-100 rounded-full text-slate-500">
+                        <div className="p-2 bg-white rounded-full shadow-sm text-blue-600">
                           <Calendar className="w-4 h-4" />
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-slate-900 flex items-center gap-2">
                             {getFriendlyEventTitle(field.type)}
                             {(field as any).isNew && (
-                              <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                              <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase">
                                 Novo
                               </span>
                             )}
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground font-medium">
                             {formatDateBr(field.date)}
                           </p>
                         </div>
                       </div>
 
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={() => remove(index)}
-                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
+                        className="text-slate-400 hover:text-destructive hover:bg-destructive/10 h-8 w-8"
                       >
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </Button>
                     </div>
                   ))}
 
                   {fields.length === 0 && (
-                    <div className="col-span-full py-8 text-center border-2 border-dashed border-slate-100 rounded-lg text-slate-400 text-sm">
-                      Nenhum evento lançado no histórico.
+                    <div className="col-span-full py-10 text-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50/50">
+                      <p className="text-sm text-muted-foreground font-medium">
+                        Nenhum evento lançado no histórico.
+                      </p>
                     </div>
                   )}
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* ── Observações ── */}
-          <div className="space-y-2 md:col-span-2 mt-4">
-            <label className="text-sm font-medium text-slate-700">Observações adicionais</label>
-            <textarea
-              {...register("notes")}
-              rows={3}
-              className="w-full flex rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
-              placeholder="Alergias, histórico familiar, etc."
-            />
-          </div>
+              {/* ── Observações ── */}
+              <div className="space-y-2 pt-4">
+                <Label htmlFor="notes">Observações adicionais</Label>
+                <Textarea
+                  id="notes"
+                  {...register("notes")}
+                  rows={4}
+                  placeholder="Alergias, histórico familiar, etc."
+                  className="resize-none"
+                />
+                {errors.notes && (
+                  <p className="text-xs font-medium text-destructive">
+                    {errors.notes.message}
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
-          <Link
-            href="/members"
-            className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
+        <div className="flex items-center justify-end gap-3 pt-6 border-t">
+          <Button
+            type="button"
+            variant="outline"
+            asChild
           >
-            Cancelar
-          </Link>
-          <button
+            <Link href="/members">Cancelar</Link>
+          </Button>
+          <Button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center justify-center gap-2 px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8"
           >
-            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            {isSubmitting ? "Salvando..." : "Salvar Membro"}
-          </button>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Salvando...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Salvar Membro
+              </>
+            )}
+          </Button>
         </div>
       </form>
 

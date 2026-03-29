@@ -5,6 +5,7 @@ import { persons, users, churchLifeEvents } from "@/lib/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { eq, and, ilike, desc, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getAuthUserContext } from "@/lib/auth-context";
 
 /** Converts any empty string values in an object to null (for optional DB date/text fields). */
 function nullify<T extends Record<string, any>>(obj: T): T {
@@ -13,31 +14,6 @@ function nullify<T extends Record<string, any>>(obj: T): T {
   ) as T;
 }
 
-async function getAuthUserContext() {
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !authUser) {
-    const [fallbackUser] = await db.select().from(users).limit(1);
-    if (!fallbackUser) {
-      throw new Error("Unauthorized and no fallback user found. Please seed the database first.");
-    }
-    return { authUser: { id: fallbackUser.id } as any, dbUser: fallbackUser };
-  }
-
-  const [dbUser] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, authUser.id))
-    .limit(1);
-
-  if (!dbUser) throw new Error("User not found in database");
-
-  return { authUser, dbUser };
-}
 
 // =========================================
 // SELECT OPTIONS

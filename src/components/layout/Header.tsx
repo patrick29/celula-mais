@@ -1,10 +1,32 @@
-import { Bell, Search } from "lucide-react";
+import { Bell, Search, Menu } from "lucide-react";
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetTrigger,
+  SheetTitle,
+  SheetHeader
+} from "@/components/ui/sheet";
+import { Sidebar } from "./Sidebar";
 
 export function Header() {
   return (
-    <div className="flex h-16 items-center border-b bg-white px-6 shadow-sm">
+    <div className="flex h-16 items-center border-b bg-white px-4 md:px-6 shadow-sm gap-x-4">
+      <Sheet>
+        <SheetTrigger asChild>
+          <button className="p-2 hover:bg-slate-100 rounded-md md:hidden text-slate-500 transition-colors">
+            <Menu className="h-5 w-5" />
+          </button>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0 w-72">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu de Navegação</SheetTitle>
+          </SheetHeader>
+          <Sidebar />
+        </SheetContent>
+      </Sheet>
+
       <div className="flex flex-1 items-center gap-x-4">
-        <div className="relative w-64">
+        <div className="relative w-full max-w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
           <input
             type="text"

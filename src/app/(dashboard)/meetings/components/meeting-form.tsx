@@ -1,40 +1,43 @@
 "use client";
 
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
 import { meetingSchema, MeetingFormInput, MeetingFormOutput } from "@/lib/validations/meeting";
 import { createMeeting, updateMeeting, getCellGroupMembers } from "@/actions/meetings";
+import { uploadMeetingPhoto } from "@/actions/upload";
 import { useRouter } from "next/navigation";
 import { Save, Loader2, Users, UserPlus, X } from "lucide-react";
 import Link from "next/link";
 import { DualListSelector } from "@/components/ui/dual-list-selector";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { createClient } from "@/lib/supabase/client";
 import { AddVisitorDialog } from "./add-visitor-dialog";
 
+import * as React from "react";
 interface MeetingFormProps {
   meeting?: any;
   cellGroups: { id: string; name: string }[];
+  initialCellMembers?: { id: string; fullName: string }[];
 }
 
 const inputClass =
   "w-full flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50";
 
-export function MeetingForm({ meeting, cellGroups }: MeetingFormProps) {
+export function MeetingForm({ meeting, cellGroups, initialCellMembers = [] }: MeetingFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [cellMembers, setCellMembers] = useState<{ id: string; fullName: string }[]>([]);
+  const [cellMembers, setCellMembers] = useState<{ id: string; fullName: string }[]>(initialCellMembers);
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [isVisitorDialogOpen, setIsVisitorDialogOpen] = useState(false);
-  // We need to keep track of added visitors who are not members of the cell
   const [visitorDetails, setVisitorDetails] = useState<{ id: string; fullName: string }[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const isFirstRender = React.useRef(true);
 
   const {
     register,
     handleSubmit,
     setValue,
+    getValues,
     control,
     formState: { errors, isSubmitting },
   } = useForm<MeetingFormInput>({
@@ -85,6 +88,29 @@ export function MeetingForm({ meeting, cellGroups }: MeetingFormProps) {
         setCellMembers([]);
         return;
       }
+
+      // Se é o primeiro render, estamos editando e o cellGroupId é o mesmo
+      // da reunião sendo editada, podemos pular o fetch no cliente, pois
+      // já recebemos via SSR initialCellMembers.
+      if (
+        isFirstRender.current && 
+        meeting && 
+        cellGroupId === meeting.cellGroupId && 
+        initialCellMembers.length > 0
+      ) {
+        isFirstRender.current = false;
+        
+        // Configuramos os visitantes detalhados que vieram com a meeting
+        if (meeting?.attendances) {
+          const currentVisitors = meeting.attendances
+            .filter((a: any) => a.status === "VISITOR")
+            .map((a: any) => ({ id: a.personId, fullName: a.fullName || "Visitante" }));
+          setVisitorDetails(currentVisitors);
+        }
+        return;
+      }
+
+      isFirstRender.current = false;
       setLoadingMembers(true);
       try {
         const { data, error } = await getCellGroupMembers(cellGroupId);
@@ -94,7 +120,8 @@ export function MeetingForm({ meeting, cellGroups }: MeetingFormProps) {
 
         // Se estiver criando nova reunião e ainda não houver presenças definidas,
         // inicializa todos como ABSENT para que apareçam na lista de "Ausentes"
-        if (!meeting && attendances.length === 0 && members.length > 0) {
+        const currentAttendances = getValues("attendances") || [];
+        if (!meeting && currentAttendances.length === 0 && members.length > 0) {
           setValue(
             "attendances",
             members.map((m) => ({ personId: m.id, status: "ABSENT" as const })),
@@ -103,7 +130,7 @@ export function MeetingForm({ meeting, cellGroups }: MeetingFormProps) {
         }
 
         // If editing, extract visitors who are not in members
-        if (meeting?.attendances) {
+        if (meeting?.attendances && cellGroupId === meeting.cellGroupId) {
           const currentVisitors = meeting.attendances
             .filter((a: any) => a.status === "VISITOR")
             .map((a: any) => ({ id: a.personId, fullName: a.fullName || "Visitante" }));
@@ -116,7 +143,7 @@ export function MeetingForm({ meeting, cellGroups }: MeetingFormProps) {
       }
     }
     fetchMembers();
-  }, [cellGroupId, meeting]);
+  }, [cellGroupId, meeting, setValue, getValues, initialCellMembers]);
 
   const selectedPersonIds = attendances
     .filter((a) => a.status === "PRESENT")
@@ -163,36 +190,38 @@ export function MeetingForm({ meeting, cellGroups }: MeetingFormProps) {
     setError(null);
     try {
       const data = input as MeetingFormOutput;
+
+      // 1. Se houver uma foto selecionada, faz o upload via server action
+      let photoUrl: string | null | undefined = undefined;
+
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        const uploadResult = await uploadMeetingPhoto(formData);
+
+        if (uploadResult.error || !uploadResult.url) {
+          console.error("Erro ao fazer upload da foto:", uploadResult.error);
+          setError(uploadResult.error || "Erro ao fazer upload da foto.");
+          return;
+        }
+
+        photoUrl = uploadResult.url;
+      } else if (meeting?.photoUrl) {
+        // Se não trocou a foto, preserva a URL existente
+        photoUrl = meeting.photoUrl;
+      }
+
+      // 2. Inclui a photoUrl no payload de criação/atualização
+      const payload = { ...data, photoUrl: photoUrl ?? null };
+
       const result = meeting
-        ? await updateMeeting(meeting.id, data)
-        : await createMeeting(data);
+        ? await updateMeeting(meeting.id, payload)
+        : await createMeeting(payload);
 
       if (result.error || !result.data) {
         setError(result.error);
         return;
-      }
-
-      const savedMeeting = result.data;
-
-      // Se houver uma foto selecionada, faz o upload
-      if (selectedFile) {
-        const supabase = createClient();
-        const fileExt = selectedFile.name.split(".").pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        const filePath = `${savedMeeting.id}/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("meeting-photos")
-          .upload(filePath, selectedFile);
-
-        if (!uploadError) {
-          const { data: { publicUrl } } = supabase.storage
-            .from("meeting-photos")
-            .getPublicUrl(filePath);
-
-          // Atualiza a reunião com a URL da foto
-          await updateMeeting(savedMeeting.id, { photoUrl: publicUrl });
-        }
       }
 
       router.push("/meetings");
@@ -341,50 +370,71 @@ export function MeetingForm({ meeting, cellGroups }: MeetingFormProps) {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">Oração Inicial</label>
-                <select
-                  {...register("initialPrayer")}
-                  className={inputClass}
-                  disabled={!cellGroupId || loadingMembers}
-                >
-                  <option value="">Selecione...</option>
-                  {[...cellMembers, ...visitorDetails].map((person) => (
-                    <option key={person.id} value={person.id}>
-                      {person.fullName}
-                    </option>
-                  ))}
-                </select>
+                <Controller
+                  control={control}
+                  name="initialPrayer"
+                  render={({ field }) => (
+                    <select
+                      {...field}
+                      value={field.value || ""}
+                      className={inputClass}
+                      disabled={!cellGroupId || loadingMembers}
+                    >
+                      <option value="">Selecione...</option>
+                      {[...cellMembers, ...visitorDetails].map((person) => (
+                        <option key={person.id} value={person.id}>
+                          {person.fullName}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">Oração Final</label>
-                <select
-                  {...register("finalPrayer")}
-                  className={inputClass}
-                  disabled={!cellGroupId || loadingMembers}
-                >
-                  <option value="">Selecione...</option>
-                  {[...cellMembers, ...visitorDetails].map((person) => (
-                    <option key={person.id} value={person.id}>
-                      {person.fullName}
-                    </option>
-                  ))}
-                </select>
+                <Controller
+                  control={control}
+                  name="finalPrayer"
+                  render={({ field }) => (
+                    <select
+                      {...field}
+                      value={field.value || ""}
+                      className={inputClass}
+                      disabled={!cellGroupId || loadingMembers}
+                    >
+                      <option value="">Selecione...</option>
+                      {[...cellMembers, ...visitorDetails].map((person) => (
+                        <option key={person.id} value={person.id}>
+                          {person.fullName}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                />
               </div>
 
               <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-medium text-slate-700">Reflexão (Palavra)</label>
-                <select
-                  {...register("responsibleForReflection")}
-                  className={inputClass}
-                  disabled={!cellGroupId || loadingMembers}
-                >
-                  <option value="">Selecione...</option>
-                  {[...cellMembers, ...visitorDetails].map((person) => (
-                    <option key={person.id} value={person.id}>
-                      {person.fullName}
-                    </option>
-                  ))}
-                </select>
+                <Controller
+                  control={control}
+                  name="responsibleForReflection"
+                  render={({ field }) => (
+                    <select
+                      {...field}
+                      value={field.value || ""}
+                      className={inputClass}
+                      disabled={!cellGroupId || loadingMembers}
+                    >
+                      <option value="">Selecione...</option>
+                      {[...cellMembers, ...visitorDetails].map((person) => (
+                        <option key={person.id} value={person.id}>
+                          {person.fullName}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                />
               </div>
 
               <div className="space-y-2 md:col-span-2">

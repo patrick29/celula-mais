@@ -1,7 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { X, Calendar, Plus, Save } from "lucide-react";
+import { Calendar, Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ChurchEventDialogProps {
   isOpen: boolean;
@@ -29,8 +46,6 @@ export function ChurchEventDialog({ isOpen, onClose, onSuccess }: ChurchEventDia
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  if (!isOpen) return null;
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!type || !date) {
@@ -45,34 +60,19 @@ export function ChurchEventDialog({ isOpen, onClose, onSuccess }: ChurchEventDia
     onClose();
   };
 
-  const inputCls = "w-full flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all";
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" 
-        onClick={onClose}
-      />
-      
-      {/* Dialog Content */}
-      <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
-        <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
-          <div className="flex items-center gap-2 text-slate-900">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <div className="flex items-center gap-2">
             <div className="p-1.5 bg-blue-100 rounded-md text-blue-600">
               <Calendar className="w-4 h-4" />
             </div>
-            <h3 className="font-semibold">Lançar Novo Evento</h3>
+            <DialogTitle>Lançar Novo Evento</DialogTitle>
           </div>
-          <button 
-            onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-slate-900">
+        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           {error && (
             <div className="p-3 bg-red-50 border border-red-100 text-red-600 rounded-lg text-sm">
               {error}
@@ -80,59 +80,61 @@ export function ChurchEventDialog({ isOpen, onClose, onSuccess }: ChurchEventDia
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Evento *</label>
-            <select 
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className={inputCls}
-            >
-              <option value="">Selecione...</option>
-              {eventTypes.map((et) => (
-                <option key={et.value} value={et.value}>{et.label}</option>
-              ))}
-            </select>
+            <Label htmlFor="event-type">Evento *</Label>
+            <Select value={type} onValueChange={setType}>
+              <SelectTrigger id="event-type">
+                <SelectValue placeholder="Selecione o evento..." />
+              </SelectTrigger>
+              <SelectContent>
+                {eventTypes.map((et) => (
+                  <SelectItem key={et.value} value={et.value}>
+                    {et.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Data *</label>
-            <input
+            <Label htmlFor="event-date">Data *</Label>
+            <Input
+              id="event-date"
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className={inputCls}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Observação (Opcional)</label>
-            <input
+            <Label htmlFor="event-notes">Observação (Opcional)</Label>
+            <Input
+              id="event-notes"
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Ex: Local, batizador, etc."
-              className={inputCls}
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-2">
-            <button
+          <DialogFooter className="pt-4">
+            <Button
               type="button"
+              variant="ghost"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
             >
               Cancelar
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={!type || !date}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 mr-2" />
               Adicionar Evento
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -5,39 +5,8 @@ import { cellGroups, users, persons, cellMembers, churchLifeEvents } from "@/lib
 import { createClient } from "@/lib/supabase/server";
 import { eq, and, ilike, desc, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getAuthUserContext } from "@/lib/auth-context";
 
-async function getAuthUserContext() {
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !authUser) {
-    const [fallbackUser] = await db.select().from(users).limit(1);
-
-    if (!fallbackUser) {
-      throw new Error("Unauthorized and no fallback user found. Please seed the database first.");
-    }
-
-    return {
-      authUser: { id: fallbackUser.id } as any,
-      dbUser: fallbackUser,
-    };
-  }
-
-  const [dbUser] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, authUser.id))
-    .limit(1);
-
-  if (!dbUser) {
-    throw new Error("User not found in database");
-  }
-
-  return { authUser, dbUser };
-}
 
 export type GetCellGroupsParams = {
   search?: string;
@@ -92,25 +61,25 @@ export async function getCellGroupById(id: string) {
   try {
     const { dbUser } = await getAuthUserContext();
 
-    const [cellGroup] = await db
-      .select()
-      .from(cellGroups)
-      .where(and(eq(cellGroups.id, id), eq(cellGroups.churchId, dbUser.churchId)))
-      .limit(1);
+    const [cellGroupResult, membersResult] = await Promise.all([
+      db.select()
+        .from(cellGroups)
+        .where(and(eq(cellGroups.id, id), eq(cellGroups.churchId, dbUser.churchId)))
+        .limit(1),
+      db.select({ personId: cellMembers.personId })
+        .from(cellMembers)
+        .where(eq(cellMembers.cellGroupId, id))
+    ]);
+
+    const [cellGroup] = cellGroupResult;
 
     if (!cellGroup) {
       return { data: null, error: "Célula não encontrada" };
     }
 
-    // Buscar integrantes
-    const members = await db
-      .select({ personId: cellMembers.personId })
-      .from(cellMembers)
-      .where(eq(cellMembers.cellGroupId, id));
-
     const dataWithMembers = {
       ...cellGroup,
-      memberIds: members.map((m) => m.personId),
+      memberIds: membersResult.map((m) => m.personId),
     };
 
     return { data: dataWithMembers, error: null };

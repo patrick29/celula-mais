@@ -3,8 +3,16 @@ import { getMeetings } from "@/actions/meetings";
 import { MeetingsTable } from "./components/meetings-table";
 import { Plus, CalendarDays } from "lucide-react";
 
-export default async function MeetingsPage() {
+interface MeetingsPageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function MeetingsPage({ searchParams }: MeetingsPageProps) {
+  const resolvedParams = await searchParams;
+  const redirectError = resolvedParams.error as string;
   const { data: meetings, error } = await getMeetings();
+
+  const displayError = redirectError || error;
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -29,13 +37,13 @@ export default async function MeetingsPage() {
         </Link>
       </div>
 
-      {error ? (
+      {displayError && (
         <div className="p-4 bg-red-50 text-red-600 rounded-md border border-red-100">
-          Ocorreu um erro ao carregar as reuniões: {error}
+          Ocorreu um erro: {displayError}
         </div>
-      ) : (
-        <MeetingsTable meetings={meetings || []} />
       )}
+
+      {!error && <MeetingsTable meetings={meetings || []} />}
     </div>
   );
 }

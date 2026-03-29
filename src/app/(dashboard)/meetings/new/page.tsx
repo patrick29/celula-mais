@@ -2,9 +2,14 @@ import { MeetingForm } from "../components/meeting-form";
 import { getCellGroupsForSelect } from "@/actions/meetings";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function NewMeetingPage() {
-  const { data: cellGroups } = await getCellGroupsForSelect();
+  const { data: cellGroups, error } = await getCellGroupsForSelect();
+
+  if (error) {
+    redirect(`/meetings?error=${encodeURIComponent(error as string)}`);
+  }
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">

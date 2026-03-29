@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const cellGroupSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
-  cellGroupType: z.enum(["CHILDREN", "YOUNG_ADULTS", "TEENAGERS", "ADULTS"], {
-    invalid_type_error: "O tipo da célula é obrigatório",
+  cellGroupType: z.enum(["CHILDREN", "YOUNG_ADULTS", "TEENAGERS", "ADULTS"] as const, {
+    message: "O tipo da célula é obrigatório",
   }),
   status: z.enum(["ACTIVE", "PLANTING", "PAUSED", "CLOSED"]).default("ACTIVE"),
   meetingDay: z.string().optional(),

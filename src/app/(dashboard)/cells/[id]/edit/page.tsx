@@ -2,7 +2,7 @@ import { CellGroupForm } from "../../components/cell-group-form";
 import { getCellGroupById, getLeadersForSelect } from "@/actions/cell-groups";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 
 interface EditCellGroupPageProps {
   params: Promise<{ id: string }>;
@@ -17,7 +17,7 @@ export default async function EditCellGroupPage({ params }: EditCellGroupPagePro
   ]);
 
   if (error || !cellGroup) {
-    notFound();
+    redirect(`/cells?error=${encodeURIComponent(error || "Célula não encontrada")}`);
   }
 
   return (

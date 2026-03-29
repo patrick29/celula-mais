@@ -1,8 +1,8 @@
 import { MeetingForm } from "../../components/meeting-form";
-import { getMeetingById, getCellGroupsForSelect } from "@/actions/meetings";
+import { getMeetingById, getCellGroupsForSelect, getCellGroupMembers } from "@/actions/meetings";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 interface EditMeetingPageProps {
   params: Promise<{ id: string }>;
@@ -10,13 +10,30 @@ interface EditMeetingPageProps {
 
 export default async function EditMeetingPage({ params }: EditMeetingPageProps) {
   const { id } = await params;
-  const [{ data: meeting }, { data: cellGroups }] = await Promise.all([
+  const [meetingResult, cellGroupsResult] = await Promise.all([
     getMeetingById(id),
     getCellGroupsForSelect(),
   ]);
 
+  if (meetingResult.error || cellGroupsResult.error) {
+    const errorMsg = meetingResult.error || cellGroupsResult.error;
+    redirect(`/meetings?error=${encodeURIComponent(errorMsg as string)}`);
+  }
+
+  const meeting = meetingResult.data;
+  const cellGroups = cellGroupsResult.data;
+
   if (!meeting) {
     notFound();
+  }
+
+  // Pre-fetch the members of the meeting's cell group to avoid client-side spinner pop-in
+  let initialCellMembers: { id: string; fullName: string }[] = [];
+  if (meeting.cellGroupId) {
+    const membersResult = await getCellGroupMembers(meeting.cellGroupId);
+    if (!membersResult.error && membersResult.data) {
+      initialCellMembers = membersResult.data;
+    }
   }
 
   return (
@@ -34,7 +51,11 @@ export default async function EditMeetingPage({ params }: EditMeetingPageProps) 
         </div>
       </div>
 
-      <MeetingForm meeting={meeting} cellGroups={cellGroups || []} />
+      <MeetingForm 
+        meeting={meeting} 
+        cellGroups={cellGroups || []} 
+        initialCellMembers={initialCellMembers}
+      />
     </div>
   );
 }
