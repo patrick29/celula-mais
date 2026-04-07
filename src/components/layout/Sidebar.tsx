@@ -15,14 +15,14 @@ export function Sidebar() {
       href: "/",
     },
     {
-      label: "Células",
-      icon: Users,
-      href: "/cells",
-    },
-    {
       label: "Membros",
       icon: UserIcon,
       href: "/members",
+    },
+    {
+      label: "Células",
+      icon: Users,
+      href: "/cells",
     },
     {
       label: "Reuniões",
