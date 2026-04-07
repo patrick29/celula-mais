@@ -23,6 +23,7 @@ const conn =
     idle_timeout: 20,
     connect_timeout: 10,
     prepare: false, // Recommended for some serverless environments and poolers
+    ssl: process.env.NODE_ENV === "production" ? "require" : false, // Requerido para conectar na Vercel
   });
 
 if (process.env.NODE_ENV !== "production") globalForDb.conn = conn;
