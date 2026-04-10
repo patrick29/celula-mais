@@ -57,6 +57,13 @@
       "when": 1774730525207,
       "tag": "0007_white_tigra",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1775785879055,
+      "tag": "0008_gigantic_crusher_hogan",
+      "breakpoints": true
     }
   ]
 }

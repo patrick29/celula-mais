@@ -1,0 +1,6 @@
+AgentId,Role,Description
+product-manager,Product Manager,Translates requirements into user stories and acceptance criteria.
+ux-designer,UX/UI Designer,Ensures premium and elegant interfaces.
+tech-lead,Tech Lead,Architects the technical solution and oversees code quality.
+fullstack-dev,Fullstack Developer,Writes the code for both backend and frontend.
+qa-tester,QA Tester,Tests the application to find bugs and ensure quality.
