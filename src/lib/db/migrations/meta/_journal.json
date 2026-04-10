@@ -64,6 +64,13 @@
       "when": 1775785879055,
       "tag": "0008_gigantic_crusher_hogan",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1775789877694,
+      "tag": "0009_confused_maddog",
+      "breakpoints": true
     }
   ]
 }

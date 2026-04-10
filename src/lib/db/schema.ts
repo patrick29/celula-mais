@@ -121,6 +121,7 @@ export const persons = pgTable("persons", {
     .references(() => churches.id, { onDelete: "cascade" }),
   cellGroupId: uuid("cell_group_id").references(() => cellGroups.id, { onDelete: "set null" }),
   fullName: text("full_name").notNull(),
+  nickname: text("nickname"),
   phone: text("phone"),
   birthDate: date("birth_date"),
   gender: genderEnum("gender"),

@@ -12,6 +12,7 @@ interface QuickPersonDialogProps {
 
 export function QuickPersonDialog({ isOpen, onClose, onSuccess }: QuickPersonDialogProps) {
   const [fullName, setFullName] = useState("");
+  const [nickname, setNickname] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,6 +31,7 @@ export function QuickPersonDialog({ isOpen, onClose, onSuccess }: QuickPersonDia
     try {
       const result = await createMember({
         fullName: fullName.trim(),
+        nickname: nickname.trim() || undefined,
         churchId: "", // Will be filled by server action
       } as any);
 
@@ -41,6 +43,7 @@ export function QuickPersonDialog({ isOpen, onClose, onSuccess }: QuickPersonDia
           fullName: result.data.fullName,
         });
         setFullName("");
+        setNickname("");
         onClose();
       }
     } catch (err: any) {
@@ -92,6 +95,19 @@ export function QuickPersonDialog({ isOpen, onClose, onSuccess }: QuickPersonDia
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Ex: Maria Oliveira"
+              className="w-full flex h-11 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              Apelido (Opcional)
+            </label>
+            <input
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="Ex: Marquinhos"
               className="w-full flex h-11 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
             />
           </div>

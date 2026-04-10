@@ -13,16 +13,20 @@ pipeline:
 
   - step: 3
     agent: tech-lead
-    action: "Revisar os requisitos do PM e o design do UX, propondo a arquitetura de software, stack e padrões de projeto."
+    action: "Revisar os requisitos do PM e o design do UX, propondo a arquitetura de software, stack, padrões de projeto e gerando um 'implementation plan' detalhado."
 
   - step: 4
+    type: checkpoint
+    message: "Verifique o implementation plan gerado pelo Tech Lead. Aprova prosseguir para o desenvolvimento (Sim/Não)?"
+
+  - step: 5
     agent: fullstack-dev
     action: "Codificar as soluções implementando a interface no frontend e a lógica de negócios e banco de dados no backend."
 
-  - step: 5
+  - step: 6
     agent: qa-tester
     action: "Testar o código do fullstack-dev garantindo ausência de bugs e adequação à arquitetura e ao design."
 
-  - step: 6
+  - step: 7
     agent: product-manager
     action: "Fazer a validação final da entrega e empacotar para apresentação ao usuário final."

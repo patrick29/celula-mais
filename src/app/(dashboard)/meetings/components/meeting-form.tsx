@@ -23,7 +23,9 @@ interface MeetingFormProps {
 const inputClass =
   "w-full flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50";
 
-export function MeetingForm({ meeting, cellGroups, initialCellMembers = [] }: MeetingFormProps) {
+const EMPTY_MEMBERS: { id: string; fullName: string }[] = [];
+
+export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_MEMBERS }: MeetingFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [cellMembers, setCellMembers] = useState<{ id: string; fullName: string }[]>(initialCellMembers);
@@ -85,7 +87,7 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = [] }: Me
   useEffect(() => {
     async function fetchMembers() {
       if (!cellGroupId) {
-        setCellMembers([]);
+        setCellMembers((prev) => prev.length === 0 ? prev : []);
         return;
       }
 

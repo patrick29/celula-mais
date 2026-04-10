@@ -115,6 +115,7 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
     defaultValues: member
       ? {
           fullName: member.fullName,
+          nickname: member.nickname || undefined,
           phone: member.phone || undefined,
           birthDate: member.birthDate || undefined,
           gender: member.gender || undefined,
@@ -213,6 +214,20 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
                 {errors.fullName && (
                   <p className="text-xs font-medium text-destructive">
                     {errors.fullName.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="nickname">Apelido</Label>
+                <Input
+                  id="nickname"
+                  {...register("nickname")}
+                  placeholder="Ex: Joãozinho"
+                />
+                {errors.nickname && (
+                  <p className="text-xs font-medium text-destructive">
+                    {errors.nickname.message}
                   </p>
                 )}
               </div>

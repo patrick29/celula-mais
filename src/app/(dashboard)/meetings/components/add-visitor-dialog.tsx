@@ -30,6 +30,7 @@ export function AddVisitorDialog({
   
   // Create mode state
   const [newName, setNewName] = useState("");
+  const [newNickname, setNewNickname] = useState("");
 
   useEffect(() => {
     if (isOpen && mode === "search") {
@@ -62,6 +63,7 @@ export function AddVisitorDialog({
     try {
       const { data, error } = await createMember({
         fullName: newName.trim(),
+        nickname: newNickname.trim() || undefined,
         attendsChurch: false, // Visitors usually don't attend church yet
       } as any);
 
@@ -81,6 +83,7 @@ export function AddVisitorDialog({
     setMode("search");
     setSearch("");
     setNewName("");
+    setNewNickname("");
     onClose();
   }
 
@@ -186,6 +189,19 @@ export function AddVisitorDialog({
                   placeholder="Nome do visitante"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">
+                  Apelido (Opcional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ex: Marquinhos"
+                  value={newNickname}
+                  onChange={(e) => setNewNickname(e.target.value)}
                   className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent"
                 />
               </div>

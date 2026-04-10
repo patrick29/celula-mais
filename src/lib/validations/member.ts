@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const memberSchema = z.object({
   fullName: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
+  nickname: z.string().optional(),
   phone: z.string().optional(),
   birthDate: z.string().optional(),
   gender: z.enum(["MALE", "FEMALE", "OTHER", ""]).optional()
