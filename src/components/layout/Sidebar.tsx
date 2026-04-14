@@ -4,9 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Users, UserIcon, Calendar, PieChart, LayoutDashboard, Settings, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { UserRole } from "@/lib/auth-context";
 
-export function Sidebar() {
+export function Sidebar({ role }: { role?: UserRole }) {
   const pathname = usePathname();
+  const canManageUsers = role === "ADMIN";
+  const settingsHref = canManageUsers ? "/settings/usuarios" : "/settings";
+  const isSettingsActive = pathname?.startsWith("/settings") ?? false;
 
   const routes = [
     {
@@ -86,20 +90,20 @@ export function Sidebar() {
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Sistema</p>
         </div>
         <Link
-          href="/settings"
+          href={settingsHref}
           className={cn(
             "group flex items-center gap-x-3 text-sm font-semibold px-3 py-3 rounded-xl transition-all duration-300 relative overflow-hidden",
-            pathname === "/settings" 
-              ? "text-blue-700 bg-blue-50 shadow-sm shadow-blue-100/50" 
+            isSettingsActive
+              ? "text-blue-700 bg-blue-50 shadow-sm shadow-blue-100/50"
               : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
           )}
         >
-          {pathname === "/settings" && (
+          {isSettingsActive && (
             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-r-full" />
           )}
           <Settings className={cn(
-            "h-5 w-5 transition-transform duration-300", 
-            pathname === "/settings" ? "text-blue-600" : "group-hover:rotate-90"
+            "h-5 w-5 transition-transform duration-300",
+            isSettingsActive ? "text-blue-600" : "group-hover:rotate-90"
           )} />
           Configurações
         </Link>

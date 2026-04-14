@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUserContext } from "@/lib/auth-context";
+import { toActionError, logActionError } from "@/lib/actions/result";
 
 export async function uploadMeetingPhoto(formData: FormData): Promise<{
   url: string | null;
@@ -11,14 +12,13 @@ export async function uploadMeetingPhoto(formData: FormData): Promise<{
     const file = formData.get("file") as File | null;
 
     if (!file) {
-      return { url: null, error: "Nenhum arquivo enviado" };
+      return { url: null, error: "Selecione um arquivo para enviar." };
     }
 
     if (file.size > 5 * 1024 * 1024) {
       return { url: null, error: "O arquivo é muito grande. O limite é 5MB." };
     }
 
-    // Usa o mesmo padrão de auth do restante do app
     const { dbUser } = await getAuthUserContext();
 
     const supabase = await createClient();
@@ -27,7 +27,6 @@ export async function uploadMeetingPhoto(formData: FormData): Promise<{
     const fileName = `${Date.now()}.${fileExt}`;
     const filePath = `${dbUser.id}/${fileName}`;
 
-    // Converte File para ArrayBuffer para uso no servidor
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
@@ -39,8 +38,11 @@ export async function uploadMeetingPhoto(formData: FormData): Promise<{
       });
 
     if (uploadError) {
-      console.error("Upload error:", uploadError);
-      return { url: null, error: `Erro no upload: ${uploadError.message}` };
+      logActionError("uploadMeetingPhoto", uploadError, { filePath });
+      return {
+        url: null,
+        error: "Não foi possível enviar a foto. Verifique o arquivo e tente novamente.",
+      };
     }
 
     const {
@@ -48,8 +50,11 @@ export async function uploadMeetingPhoto(formData: FormData): Promise<{
     } = supabase.storage.from("meeting-photos").getPublicUrl(filePath);
 
     return { url: publicUrl, error: null };
-  } catch (error: any) {
-    console.error("Upload error:", error);
-    return { url: null, error: error.message || "Erro desconhecido no upload" };
+  } catch (err) {
+    logActionError("uploadMeetingPhoto", err);
+    return {
+      url: null,
+      error: toActionError(err, "Não foi possível enviar a foto. Tente novamente em instantes."),
+    };
   }
 }

@@ -12,6 +12,7 @@ import Link from "next/link";
 import { DualListSelector } from "@/components/ui/dual-list-selector";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { AddVisitorDialog } from "./add-visitor-dialog";
+import { toast } from "@/lib/toast";
 
 import * as React from "react";
 interface MeetingFormProps {
@@ -116,7 +117,11 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
       setLoadingMembers(true);
       try {
         const { data, error } = await getCellGroupMembers(cellGroupId);
-        if (error) throw new Error(error);
+        if (error) {
+          toast.error(error);
+          setCellMembers([]);
+          return;
+        }
         const members = data || [];
         setCellMembers(members);
 
@@ -138,8 +143,9 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
             .map((a: any) => ({ id: a.personId, fullName: a.fullName || "Visitante" }));
           setVisitorDetails(currentVisitors);
         }
-      } catch (err: any) {
-        console.error(err);
+      } catch {
+        toast.error("Não foi possível carregar os membros da célula. Tente novamente em instantes.");
+        setCellMembers([]);
       } finally {
         setLoadingMembers(false);
       }
@@ -203,8 +209,9 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
         const uploadResult = await uploadMeetingPhoto(formData);
 
         if (uploadResult.error || !uploadResult.url) {
-          console.error("Erro ao fazer upload da foto:", uploadResult.error);
-          setError(uploadResult.error || "Erro ao fazer upload da foto.");
+          const message = uploadResult.error || "Não foi possível enviar a foto. Tente novamente.";
+          setError(message);
+          toast.error(message);
           return;
         }
 
@@ -222,14 +229,19 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
         : await createMeeting(payload);
 
       if (result.error || !result.data) {
-        setError(result.error);
+        const message = result.error ?? "Não foi possível concluir esta ação. Tente novamente em instantes.";
+        setError(message);
+        toast.error(message);
         return;
       }
 
+      toast.success(meeting ? "Reunião atualizada" : "Reunião registrada");
       router.push("/meetings");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || "Erro desconhecido ao salvar.");
+    } catch {
+      const message = "Não foi possível concluir esta ação. Tente novamente em instantes.";
+      setError(message);
+      toast.error(message);
     }
   }
 

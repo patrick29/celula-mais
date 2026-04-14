@@ -25,6 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Controller } from "react-hook-form";
 import { cn } from "@/lib/utils";
+import { toast } from "@/lib/toast";
 
 type PersonOption = { id: string; fullName: string };
 
@@ -152,7 +153,6 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
         gender: data.gender === "" ? undefined : data.gender,
         churchId: "",
         cellGroupId: null,
-        // Se modo "select" mas sem id selecionado, nulifica
         spouseId: spouseMode === "select" ? (data.spouseId === "none" ? null : (data.spouseId || null)) : null,
         spouseQuickName: spouseMode === "quick" ? data.spouseQuickName : undefined,
         spouseAttends: spouseMode === "quick" ? data.spouseAttends : undefined,
@@ -168,13 +168,17 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
 
       if (result.error) {
         setError(result.error);
+        toast.error(result.error);
         return;
       }
 
+      toast.success(member ? "Membro atualizado" : "Membro cadastrado");
       router.push("/members");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || "Erro desconhecido ao salvar.");
+    } catch {
+      const message = "Não foi possível concluir esta ação. Tente novamente em instantes.";
+      setError(message);
+      toast.error(message);
     }
   }
 

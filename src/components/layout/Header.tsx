@@ -1,14 +1,22 @@
 import { Bell, Search, Menu } from "lucide-react";
-import { 
-  Sheet, 
-  SheetContent, 
+import {
+  Sheet,
+  SheetContent,
   SheetTrigger,
   SheetTitle,
-  SheetHeader
+  SheetHeader,
 } from "@/components/ui/sheet";
 import { Sidebar } from "./Sidebar";
+import { UserMenu } from "./user-menu";
+import type { UserRole } from "@/lib/auth-context";
 
-export function Header() {
+type HeaderUser = {
+  fullName: string;
+  email: string;
+  role: UserRole;
+};
+
+export function Header({ user }: { user: HeaderUser }) {
   return (
     <div className="flex h-16 items-center border-b bg-white px-4 md:px-6 shadow-sm gap-x-4">
       <Sheet>
@@ -21,7 +29,7 @@ export function Header() {
           <SheetHeader className="sr-only">
             <SheetTitle>Menu de Navegação</SheetTitle>
           </SheetHeader>
-          <Sidebar />
+          <Sidebar role={user.role} />
         </SheetContent>
       </Sheet>
 
@@ -40,15 +48,11 @@ export function Header() {
           <Bell className="h-5 w-5" />
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
         </button>
-        <div className="flex items-center gap-x-2 ml-2 border-l pl-4">
-          <div className="flex flex-col text-right">
-            <span className="text-sm font-semibold text-slate-900">Admin Silva</span>
-            <span className="text-xs text-slate-500">Administrador</span>
-          </div>
-          <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200">
-            AS
-          </div>
-        </div>
+        <UserMenu
+          fullName={user.fullName}
+          email={user.email}
+          role={user.role}
+        />
       </div>
     </div>
   );

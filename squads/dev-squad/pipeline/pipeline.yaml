@@ -1,0 +1,30 @@
+name: Dev Squad Pipeline
+description: Ciclo end-to-end de desenvolvimento — requisitos → UX → plano técnico → checkpoint → implementação → QA → entrega final.
+
+steps:
+  - id: step-01
+    name: Analisar requisitos
+    file: steps/step-01-analisar-requisitos.md
+  - id: step-02
+    name: Especificar UX
+    file: steps/step-02-especificar-ux.md
+  - id: step-03
+    name: Desenhar plano técnico
+    file: steps/step-03-plano-tecnico.md
+  - id: step-04
+    name: Aprovar plano técnico
+    file: steps/step-04-aprovar-plano.md
+    type: checkpoint
+  - id: step-05
+    name: Implementar solução
+    file: steps/step-05-implementar.md
+  - id: step-06
+    name: Validar qualidade
+    file: steps/step-06-validar-qa.md
+    on_reject: step-05
+  - id: step-07
+    name: Entrega final
+    file: steps/step-07-entrega-final.md
+
+checkpoints:
+  - step-04

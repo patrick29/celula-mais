@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find c:/development/antigravity/celula-mais/squads/dev-squad -type f -name \"*.md\" -exec wc -l {} +)",
+      "Bash(wc -l c:/development/antigravity/celula-mais/squads/dev-squad/agents/*.agent.md)"
+    ]
+  }
+}

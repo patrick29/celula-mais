@@ -1,0 +1,34 @@
+squad_code: "dev-squad"
+purpose: "Implementação de código sem bugs, seguindo boas práticas, testado. Squad completa de desenvolvimento de software para o projeto Célula Mais — entrega features novas, módulos completos e bug fixes/refactors com qualidade."
+domain: "automation"
+
+company:
+  name: "Célula Mais"
+  sector: "Gestão Religiosa / Institucional"
+  audience: "Pastores, líderes de células, supervisores e administradores da igreja"
+  tone: "Profissional, acolhedor, organizado, intuitivo e respeitoso"
+
+language: "Português (Brasil)"
+
+context:
+  scope_per_run: "any-size — feature pequena, módulo completo, bug fix ou refactor"
+  quality_bar: "minimum-viable — código funcional, testado manualmente, sem testes automatizados obrigatórios"
+  stack: "Específica do Célula Mais — Next.js + TypeScript + banco já configurado + componentes UI existentes (sidebar, layouts, etc.)"
+  checkpoints: "1 checkpoint — após o plano técnico, antes do dev codar"
+  team_composition:
+    - product-manager
+    - ux-designer (dedicated, designs flows/wireframes/design-system)
+    - tech-lead
+    - fullstack-dev
+    - qa-tester
+
+tools_needed:
+  - file-read-write
+  - code-execution
+  - web-search
+
+investigation:
+  enabled: false
+  profiles: []
+
+target_formats: []

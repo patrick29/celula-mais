@@ -60,7 +60,7 @@ export const users = pgTable("users", {
   fullName: text("full_name").notNull(),
   email: text("email").notNull().unique(),
   phone: text("phone"),
-  passwordHash: text("password_hash").notNull(),
+  passwordHash: text("password_hash"),
   role: userRoleEnum("role").notNull(),
   churchId: uuid("church_id")
     .notNull()
@@ -68,12 +68,16 @@ export const users = pgTable("users", {
   supervisorId: uuid("supervisor_id").references((): any => users.id, {
     onDelete: "set null",
   }),
+  isActive: boolean("is_active").notNull().default(true),
+  mustChangePassword: boolean("must_change_password").notNull().default(false),
+  lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => {
   return [
     index("idx_users_church").on(table.churchId),
     index("idx_users_supervisor").on(table.supervisorId),
+    index("idx_users_active").on(table.churchId, table.isActive),
   ];
 });
 

@@ -10,6 +10,7 @@ import { Save, Loader2, ArrowLeft, Search, User, X, UserPlus } from "lucide-reac
 import Link from "next/link";
 import { cellGroups } from "@/lib/db/schema";
 import { QuickPersonDialog } from "./quick-person-dialog";
+import { toast } from "@/lib/toast";
 
 type Person = { id: string; fullName: string };
 
@@ -147,13 +148,17 @@ export function CellGroupForm({ cellGroup, leaders = [] }: CellGroupFormProps) {
 
       if (result.error) {
         setError(result.error);
+        toast.error(result.error);
         return;
       }
 
+      toast.success(cellGroup ? "Célula atualizada" : "Célula criada");
       router.push("/cells");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || "Erro desconhecido ao salvar.");
+    } catch {
+      const message = "Não foi possível concluir esta ação. Tente novamente em instantes.";
+      setError(message);
+      toast.error(message);
     }
   }
 

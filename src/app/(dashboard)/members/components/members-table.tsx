@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { deleteMember } from "@/actions/members";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 type Member = typeof persons.$inferSelect & {
   churchLifeEvents?: any[];
@@ -18,17 +19,19 @@ export function MembersTable({ members }: { members: Member[] }) {
   async function handleDelete(id: string, name: string) {
     if (!confirm(`Tem certeza que deseja excluir o membro "${name}"? Esta ação não pode ser desfeita.`)) return;
 
+    setDeletingId(id);
     try {
-      setDeletingId(id);
       const result = await deleteMember(id);
-      
+
       if (result.error) {
-        alert("Erro ao excluir membro: " + result.error);
-      } else {
-        router.refresh();
+        toast.error(result.error);
+        return;
       }
-    } catch (error) {
-      alert("Erro inesperado ao excluir membro.");
+
+      toast.success("Membro removido");
+      router.refresh();
+    } catch {
+      toast.error("Não foi possível concluir esta ação. Tente novamente em instantes.");
     } finally {
       setDeletingId(null);
     }

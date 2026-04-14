@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { eq, and, ilike, desc, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getAuthUserContext } from "@/lib/auth-context";
+import { toActionError, userError, logActionError } from "@/lib/actions/result";
 
 
 export type GetCellGroupsParams = {
@@ -51,9 +52,9 @@ export async function getCellGroups(params?: GetCellGroupsParams) {
       .orderBy(desc(cellGroups.createdAt));
 
     return { data: cellGroupsList, error: null };
-  } catch (error: any) {
-    console.error("Error fetching cell groups:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("getCellGroups", err, { params });
+    return { data: null, error: toActionError(err, "Não foi possível carregar a lista de células.") };
   }
 }
 
@@ -74,7 +75,7 @@ export async function getCellGroupById(id: string) {
     const [cellGroup] = cellGroupResult;
 
     if (!cellGroup) {
-      return { data: null, error: "Célula não encontrada" };
+      return { data: null, error: "Esta célula não está mais disponível." };
     }
 
     const dataWithMembers = {
@@ -83,9 +84,9 @@ export async function getCellGroupById(id: string) {
     };
 
     return { data: dataWithMembers, error: null };
-  } catch (error: any) {
-    console.error("Error fetching cell group by id:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("getCellGroupById", err, { id });
+    return { data: null, error: toActionError(err, "Não foi possível carregar os dados da célula.") };
   }
 }
 
@@ -100,9 +101,9 @@ export async function getLeadersForSelect() {
       .orderBy(persons.fullName);
 
     return { data: leaders, error: null };
-  } catch (error: any) {
-    console.error("Error fetching leaders:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("getLeadersForSelect", err);
+    return { data: null, error: toActionError(err, "Não foi possível carregar a lista de líderes.") };
   }
 }
 
@@ -153,9 +154,9 @@ export async function createCellGroup(data: any) {
 
     revalidatePath("/cells");
     return { data: newCellGroup, error: null };
-  } catch (error: any) {
-    console.error("Error creating cell group:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("createCellGroup", err);
+    return { data: null, error: toActionError(err, "Não foi possível criar a célula. Tente novamente.") };
   }
 }
 
@@ -186,7 +187,7 @@ export async function updateCellGroup(id: string, data: any) {
       .returning();
 
     if (!updatedCellGroup) {
-      throw new Error("Célula não encontrada ou acesso negado");
+      userError("Esta célula não está mais disponível ou você não tem permissão.");
     }
 
     // Lançar eventos de transição de funções
@@ -238,9 +239,9 @@ export async function updateCellGroup(id: string, data: any) {
 
     revalidatePath("/cells");
     return { data: updatedCellGroup, error: null };
-  } catch (error: any) {
-    console.error("Error updating cell group:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("updateCellGroup", err, { id });
+    return { data: null, error: toActionError(err, "Não foi possível atualizar a célula. Tente novamente.") };
   }
 }
 
@@ -254,13 +255,13 @@ export async function deleteCellGroup(id: string) {
       .returning();
 
     if (!deletedCellGroup) {
-      throw new Error("Célula não encontrada ou acesso negado");
+      userError("Esta célula não está mais disponível ou você não tem permissão.");
     }
 
     revalidatePath("/cells");
     return { data: deletedCellGroup, error: null };
-  } catch (error: any) {
-    console.error("Error deleting cell group:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("deleteCellGroup", err, { id });
+    return { data: null, error: toActionError(err, "Não foi possível excluir a célula. Tente novamente.") };
   }
 }

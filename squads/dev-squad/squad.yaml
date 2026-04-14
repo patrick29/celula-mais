@@ -1,32 +1,35 @@
-name: "Dev Squad"
-description: "Squad completa de desenvolvimento focada em sistemas de alta qualidade e interfaces premium."
-version: 1.0
+code: dev-squad
+name: Dev Squad Célula Mais
+description: Squad de desenvolvimento de software para o Célula Mais — entrega features, módulos, bug fixes e refactors com qualidade minimum-viable.
+language: pt-BR
+domain: automation
 
-pipeline:
-  - step: 1
-    agent: product-manager
-    action: "Analisar o escopo, definir as entidades principais e criar as histórias de usuário."
-  
-  - step: 2
-    agent: ux-designer
-    action: "Desenhar as propostas de interface, fluxos e design system básico baseado no que o PM definiu."
+company:
+  name: Célula Mais
+  sector: Gestão Religiosa / Institucional
+  audience: Pastores, líderes de células, supervisores e administradores da igreja
+  tone: Profissional, acolhedor, organizado, intuitivo e respeitoso
 
-  - step: 3
-    agent: tech-lead
-    action: "Revisar os requisitos do PM e o design do UX, propondo a arquitetura de software, stack, padrões de projeto e gerando um 'implementation plan' detalhado."
+party: ./squad-party.csv
+pipeline: ./pipeline/pipeline.yaml
 
-  - step: 4
-    type: checkpoint
-    message: "Verifique o implementation plan gerado pelo Tech Lead. Aprova prosseguir para o desenvolvimento (Sim/Não)?"
+skills:
+  - web_search
+  - web_fetch
 
-  - step: 5
-    agent: fullstack-dev
-    action: "Codificar as soluções implementando a interface no frontend e a lógica de negócios e banco de dados no backend."
+data:
+  - pipeline/data/research-brief.md
+  - pipeline/data/domain-framework.md
+  - pipeline/data/quality-criteria.md
+  - pipeline/data/output-examples.md
+  - pipeline/data/anti-patterns.md
 
-  - step: 6
-    agent: qa-tester
-    action: "Testar o código do fullstack-dev garantindo ausência de bugs e adequação à arquitetura e ao design."
+memory:
+  - _memory/memories.md
+  - _memory/runs.md
 
-  - step: 7
-    agent: product-manager
-    action: "Fazer a validação final da entrega e empacotar para apresentação ao usuário final."
+context:
+  scope_per_run: any-size
+  quality_bar: minimum-viable
+  stack: Next.js + TypeScript + Drizzle ORM + PostgreSQL + componentes UI existentes
+  checkpoints: 1 checkpoint (após plano técnico, antes de codar)

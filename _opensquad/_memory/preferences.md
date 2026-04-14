@@ -1,3 +1,6 @@
-name: "Patrick"
-language: "pt-BR"
-default_squad: "dev-squad"
+# Opensquad Preferences
+
+- **User Name:** Patrick
+- **Output Language:** Português (Brasil)
+- **IDEs:** claude-code
+- **Date Format:** YYYY-MM-DD

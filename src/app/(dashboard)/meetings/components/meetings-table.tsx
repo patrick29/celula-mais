@@ -5,6 +5,7 @@ import Link from "next/link";
 import { deleteMeeting } from "@/actions/meetings";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "@/lib/toast";
 
 type Meeting = {
   id: string;
@@ -34,12 +35,18 @@ export function MeetingsTable({ meetings }: { meetings: Meeting[] }) {
   async function handleDelete(id: string, date: string) {
     if (!confirm(`Tem certeza que deseja excluir a reunião do dia ${formatDate(date)}? Esta ação não pode ser desfeita.`)) return;
     setDeletingId(id);
-    const result = await deleteMeeting(id);
-    setDeletingId(null);
-    if (result.error) {
-      alert(`Erro ao excluir: ${result.error}`);
-    } else {
+    try {
+      const result = await deleteMeeting(id);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Reunião removida");
       router.refresh();
+    } catch {
+      toast.error("Não foi possível concluir esta ação. Tente novamente em instantes.");
+    } finally {
+      setDeletingId(null);
     }
   }
 

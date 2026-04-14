@@ -2,11 +2,14 @@ import { cache } from "react";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { createClient } from "@/lib/supabase/server";
+import { userError } from "@/lib/actions/result";
 import { eq } from "drizzle-orm";
+
+export type UserRole = "ADMIN" | "PASTOR" | "SUPERVISOR" | "LEADER" | "ASSISTANT";
 
 /**
  * Deduplicated auth context fetcher using React's cache().
- * This prevents redundant database and Supabase Auth calls within the same request lifecycle.
+ * Prevents redundant database and Supabase Auth calls within the same request lifecycle.
  */
 export const getAuthUserContext = cache(async () => {
   const supabase = await createClient();
@@ -16,18 +19,7 @@ export const getAuthUserContext = cache(async () => {
   } = await supabase.auth.getUser();
 
   if (error || !authUser) {
-    // Attempt fallback only if specifically required or during initial development/seeding
-    // In many production cases, you might prefer throwing a strict Unauthorized error.
-    const [fallbackUser] = await db.select().from(users).limit(1);
-
-    if (!fallbackUser) {
-      throw new Error("Unauthorized and no fallback user found. Please seed the database first.");
-    }
-
-    return {
-      authUser: { id: fallbackUser.id } as any,
-      dbUser: fallbackUser,
-    };
+    userError("Sua sessão expirou. Entre novamente para continuar.");
   }
 
   const [dbUser] = await db
@@ -37,8 +29,21 @@ export const getAuthUserContext = cache(async () => {
     .limit(1);
 
   if (!dbUser) {
-    throw new Error("User not found in database");
+    userError("Sua conta não foi encontrada. Fale com o administrador.");
+  }
+
+  if (!dbUser.isActive) {
+    await supabase.auth.signOut();
+    userError("Sua conta está desativada. Fale com o administrador.");
   }
 
   return { authUser, dbUser };
 });
+
+export async function requireRole(allowed: UserRole[]) {
+  const ctx = await getAuthUserContext();
+  if (!allowed.includes(ctx.dbUser.role as UserRole)) {
+    userError("Você não tem permissão para acessar esta área.");
+  }
+  return ctx;
+}

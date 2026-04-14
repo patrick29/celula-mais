@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { Upload, X, ImageIcon } from "lucide-react";
+import { toast } from "@/lib/toast";
 
 interface ImageUploadProps {
   value?: string;
@@ -17,7 +18,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        alert("O arquivo é muito grande. O limite é 5MB.");
+        toast.error("O arquivo é muito grande. O limite é 5MB.");
         return;
       }
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X, Loader2, UserPlus } from "lucide-react";
 import { createMember } from "@/actions/members";
+import { toast } from "@/lib/toast";
 
 interface QuickPersonDialogProps {
   isOpen: boolean;
@@ -37,7 +38,9 @@ export function QuickPersonDialog({ isOpen, onClose, onSuccess }: QuickPersonDia
 
       if (result.error) {
         setError(result.error);
+        toast.error(result.error);
       } else if (result.data) {
+        toast.success("Pessoa cadastrada");
         onSuccess({
           id: result.data.id,
           fullName: result.data.fullName,
@@ -46,8 +49,10 @@ export function QuickPersonDialog({ isOpen, onClose, onSuccess }: QuickPersonDia
         setNickname("");
         onClose();
       }
-    } catch (err: any) {
-      setError(err.message || "Erro ao cadastrar pessoa.");
+    } catch {
+      const message = "Não foi possível concluir esta ação. Tente novamente em instantes.";
+      setError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, Search, UserPlus, Loader2, Check } from "lucide-react";
 import { getPersonsForSelect, createMember } from "@/actions/members";
+import { toast } from "@/lib/toast";
 
 interface Person {
   id: string;
@@ -42,10 +43,15 @@ export function AddVisitorDialog({
     setLoading(true);
     try {
       const { data, error } = await getPersonsForSelect();
-      if (error) throw new Error(error);
+      if (error) {
+        toast.error(error);
+        setAvailablePersons([]);
+        return;
+      }
       setAvailablePersons(data || []);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      toast.error("Não foi possível carregar a lista de pessoas. Tente novamente em instantes.");
+      setAvailablePersons([]);
     } finally {
       setLoading(false);
     }
@@ -67,13 +73,17 @@ export function AddVisitorDialog({
         attendsChurch: false, // Visitors usually don't attend church yet
       } as any);
 
-      if (error) throw new Error(error);
+      if (error) {
+        toast.error(error);
+        return;
+      }
       if (data) {
+        toast.success("Visitante cadastrado");
         onSuccess({ id: data.id, fullName: data.fullName });
         handleClose();
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      toast.error("Não foi possível concluir esta ação. Tente novamente em instantes.");
     } finally {
       setSubmitting(false);
     }

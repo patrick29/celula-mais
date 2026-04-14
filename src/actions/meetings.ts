@@ -7,6 +7,7 @@ import { eq, and, ilike, desc, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { revalidatePath } from "next/cache";
 import { getAuthUserContext } from "@/lib/auth-context";
+import { toActionError, userError, logActionError } from "@/lib/actions/result";
 
 
 export type GetMeetingsParams = {
@@ -62,9 +63,9 @@ export async function getMeetings(params?: GetMeetingsParams) {
       .orderBy(desc(meetings.meetingDate));
 
     return { data: meetingsList, error: null };
-  } catch (error: any) {
-    console.error("Error fetching meetings:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("getMeetings", err, { params });
+    return { data: null, error: toActionError(err, "Não foi possível carregar as reuniões.") };
   }
 }
 
@@ -119,13 +120,13 @@ export async function getMeetingById(id: string) {
     const [meeting] = meetingResult;
 
     if (!meeting) {
-      return { data: null, error: "Reunião não encontrada" };
+      return { data: null, error: "Esta reunião não está mais disponível." };
     }
 
     return { data: { ...meeting, attendances: attendancesResult }, error: null };
-  } catch (error: any) {
-    console.error("Error fetching meeting by id:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("getMeetingById", err, { id });
+    return { data: null, error: toActionError(err, "Não foi possível carregar os dados da reunião.") };
   }
 }
 
@@ -140,9 +141,9 @@ export async function getCellGroupsForSelect() {
       .orderBy(cellGroups.name);
 
     return { data: cellGroupsData, error: null };
-  } catch (error: any) {
-    console.error("Error fetching cell groups for select:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("getCellGroupsForSelect", err);
+    return { data: null, error: toActionError(err, "Não foi possível carregar a lista de células.") };
   }
 }
 
@@ -172,7 +173,7 @@ export async function getCellGroupMembers(cellGroupId: string) {
 
     const [cellGroup] = cellGroupResult;
 
-    if (!cellGroup) return { data: [], error: "Célula não encontrada" };
+    if (!cellGroup) return { data: [], error: "Esta célula não está mais disponível." };
 
     // 3. Get leadership persons details
     const leadershipIds = [cellGroup.leaderId, cellGroup.coLeaderId, cellGroup.hostId].filter(
@@ -198,9 +199,9 @@ export async function getCellGroupMembers(cellGroupId: string) {
       .sort((a, b) => a.fullName.localeCompare(b.fullName));
 
     return { data: result, error: null };
-  } catch (error: any) {
-    console.error("Error fetching cell group members:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("getCellGroupMembers", err, { cellGroupId });
+    return { data: null, error: toActionError(err, "Não foi possível carregar os membros da célula.") };
   }
 }
 
@@ -275,9 +276,9 @@ export async function createMeeting(data: {
 
     revalidatePath("/meetings");
     return { data: newMeeting, error: null };
-  } catch (error: any) {
-    console.error("Error creating meeting:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("createMeeting", err);
+    return { data: null, error: toActionError(err, "Não foi possível registrar a reunião. Tente novamente.") };
   }
 }
 
@@ -312,7 +313,7 @@ export async function updateMeeting(
       .limit(1);
 
     if (!existing) {
-      throw new Error("Reunião não encontrada ou acesso negado");
+      userError("Esta reunião não está mais disponível ou você não tem permissão.");
     }
 
     // Fetch existing meeting data to merge counts
@@ -323,7 +324,7 @@ export async function updateMeeting(
       .limit(1);
 
     if (!meeting) {
-      throw new Error("Reunião não encontrada");
+      userError("Esta reunião não está mais disponível.");
     }
 
     const visitorCount = data.visitorCount !== undefined ? data.visitorCount : (meeting.visitorCount ?? 0);
@@ -401,9 +402,9 @@ export async function updateMeeting(
 
     revalidatePath("/meetings");
     return { data: updatedMeeting, error: null };
-  } catch (error: any) {
-    console.error("Error updating meeting:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("updateMeeting", err, { id });
+    return { data: null, error: toActionError(err, "Não foi possível atualizar a reunião. Tente novamente.") };
   }
 }
 
@@ -422,7 +423,7 @@ export async function deleteMeeting(id: string) {
       .limit(1);
 
     if (!existing) {
-      throw new Error("Reunião não encontrada ou acesso negado");
+      userError("Esta reunião não está mais disponível ou você não tem permissão.");
     }
 
     const [deletedMeeting] = await db
@@ -432,8 +433,8 @@ export async function deleteMeeting(id: string) {
 
     revalidatePath("/meetings");
     return { data: deletedMeeting, error: null };
-  } catch (error: any) {
-    console.error("Error deleting meeting:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("deleteMeeting", err, { id });
+    return { data: null, error: toActionError(err, "Não foi possível excluir a reunião. Tente novamente.") };
   }
 }

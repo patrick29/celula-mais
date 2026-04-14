@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { eq, and, ilike, desc, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getAuthUserContext } from "@/lib/auth-context";
+import { toActionError, userError, logActionError } from "@/lib/actions/result";
 
 /** Converts any empty string values in an object to null (for optional DB date/text fields). */
 function nullify<T extends Record<string, any>>(obj: T): T {
@@ -34,8 +35,9 @@ export async function getPersonsForSelect(excludeId?: string) {
       .orderBy(persons.fullName);
 
     return { data: allPersons, error: null };
-  } catch (error: any) {
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("getPersonsForSelect", err, { excludeId });
+    return { data: null, error: toActionError(err, "Não foi possível carregar a lista de pessoas.") };
   }
 }
 
@@ -68,9 +70,9 @@ export async function getMembers(params?: GetMembersParams) {
     });
 
     return { data: membersList, error: null };
-  } catch (error: any) {
-    console.error("Error fetching members:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("getMembers", err, { params });
+    return { data: null, error: toActionError(err, "Não foi possível carregar a lista de membros.") };
   }
 }
 
@@ -88,12 +90,12 @@ export async function getMemberById(id: string) {
       },
     });
 
-    if (!member) return { data: null, error: "Member not found" };
+    if (!member) return { data: null, error: "Este membro não está mais disponível." };
 
     return { data: member, error: null };
-  } catch (error: any) {
-    console.error("Error fetching member by id:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("getMemberById", err, { id });
+    return { data: null, error: toActionError(err, "Não foi possível carregar os dados do membro.") };
   }
 }
 
@@ -156,9 +158,9 @@ export async function createMember(
 
     revalidatePath("/members");
     return { data: newMember, error: null };
-  } catch (error: any) {
-    console.error("Error creating member:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("createMember", err);
+    return { data: null, error: toActionError(err, "Não foi possível cadastrar o membro. Tente novamente.") };
   }
 }
 
@@ -196,7 +198,7 @@ export async function updateMember(
       .where(and(eq(persons.id, id), eq(persons.churchId, dbUser.churchId)))
       .returning();
 
-    if (!updatedMember) throw new Error("Member not found or access denied");
+    if (!updatedMember) userError("Este membro não está mais disponível ou você não tem permissão.");
 
     // Vínculo bidirecional
     if (resolvedSpouseId) {
@@ -221,9 +223,9 @@ export async function updateMember(
 
     revalidatePath("/members");
     return { data: updatedMember, error: null };
-  } catch (error: any) {
-    console.error("Error updating member:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("updateMember", err, { id });
+    return { data: null, error: toActionError(err, "Não foi possível atualizar o membro. Tente novamente.") };
   }
 }
 
@@ -236,12 +238,12 @@ export async function deleteMember(id: string) {
       .where(and(eq(persons.id, id), eq(persons.churchId, dbUser.churchId)))
       .returning();
 
-    if (!deletedMember) throw new Error("Member not found or access denied");
+    if (!deletedMember) userError("Este membro não está mais disponível ou você não tem permissão.");
 
     revalidatePath("/members");
     return { data: deletedMember, error: null };
-  } catch (error: any) {
-    console.error("Error deleting member:", error);
-    return { data: null, error: error.message };
+  } catch (err) {
+    logActionError("deleteMember", err, { id });
+    return { data: null, error: toActionError(err, "Não foi possível excluir o membro. Tente novamente.") };
   }
 }

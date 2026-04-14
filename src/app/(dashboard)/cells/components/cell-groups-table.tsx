@@ -5,6 +5,7 @@ import Link from "next/link";
 import { deleteCellGroup } from "@/actions/cell-groups";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "@/lib/toast";
 
 type CellGroup = {
   id: string;
@@ -39,13 +40,20 @@ export function CellGroupsTable({ cellGroups }: { cellGroups: CellGroup[] }) {
     if (!confirm(`Tem certeza que deseja excluir a célula "${name}"? Esta ação não pode ser desfeita.`)) return;
 
     setDeletingId(id);
-    const result = await deleteCellGroup(id);
-    setDeletingId(null);
+    try {
+      const result = await deleteCellGroup(id);
 
-    if (result.error) {
-      alert(`Erro ao excluir: ${result.error}`);
-    } else {
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success("Célula removida");
       router.refresh();
+    } catch {
+      toast.error("Não foi possível concluir esta ação. Tente novamente em instantes.");
+    } finally {
+      setDeletingId(null);
     }
   }
 
