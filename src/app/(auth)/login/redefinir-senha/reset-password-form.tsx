@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import { updatePasswordWithToken } from "@/actions/auth";
+import { signOut, updatePasswordWithToken } from "@/actions/auth";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "@/lib/toast";
 import { Card } from "@/components/ui/card";
@@ -130,9 +130,14 @@ export function ResetPasswordForm({ first }: { first: boolean }) {
             por segurança.
           </p>
         </div>
-        <Button asChild size="lg" className="w-full">
-          <Link href="/login/esqueci-senha">Solicitar novo link</Link>
-        </Button>
+        <div className="space-y-2">
+          <Button asChild size="lg" className="w-full">
+            <Link href="/login/esqueci-senha">Solicitar novo link</Link>
+          </Button>
+          <Button asChild variant="ghost" size="lg" className="w-full">
+            <Link href="/login">Voltar para o login</Link>
+          </Button>
+        </div>
       </Card>
     );
   }
@@ -186,6 +191,17 @@ export function ResetPasswordForm({ first }: { first: boolean }) {
           disabled={isPending || !passwordOk}
         >
           {isPending ? "Salvando…" : "Salvar nova senha"}
+        </Button>
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="lg"
+          className="w-full"
+          disabled={isPending}
+          onClick={() => startTransition(async () => { await signOut(); })}
+        >
+          Voltar para o login
         </Button>
       </form>
     </Card>
