@@ -1,0 +1,55 @@
+{
+  "squad": "dev-squad",
+  "status": "completed",
+  "step": {
+    "current": 7,
+    "total": 7,
+    "label": "step-07"
+  },
+  "agents": [
+    {
+      "id": "product-manager",
+      "name": "Pedro Produto",
+      "icon": "📋",
+      "status": "done",
+      "desk": { "col": 1, "row": 1 }
+    },
+    {
+      "id": "ux-designer",
+      "name": "Daniela Design",
+      "icon": "🎨",
+      "status": "done",
+      "desk": { "col": 2, "row": 1 }
+    },
+    {
+      "id": "tech-lead",
+      "name": "Tiago Técnico",
+      "icon": "🧠",
+      "status": "done",
+      "desk": { "col": 3, "row": 1 }
+    },
+    {
+      "id": "fullstack-dev",
+      "name": "Felipe Fullstack",
+      "icon": "⚡",
+      "status": "done",
+      "desk": { "col": 1, "row": 2 }
+    },
+    {
+      "id": "qa-tester",
+      "name": "Quirino Qualidade",
+      "icon": "🔍",
+      "status": "done",
+      "desk": { "col": 2, "row": 2 }
+    }
+  ],
+  "handoff": {
+    "from": "qa-tester",
+    "to": "product-manager",
+    "message": "QA aprovou com 17/17 itens PASS. Sem bugs encontrados. Entregando ao PM para comunicação final.",
+    "completedAt": "2026-04-18T22:03:00Z"
+  },
+  "startedAt": "2026-04-18T21:56:38Z",
+  "updatedAt": "2026-04-18T22:04:00Z",
+  "completedAt": "2026-04-18T22:04:00Z"
+}

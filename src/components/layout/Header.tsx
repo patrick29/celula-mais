@@ -1,4 +1,5 @@
-import { Bell, Search, Menu } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
+import { SearchCommand } from "./search-command";
 import {
   Sheet,
   SheetContent,
@@ -34,14 +35,7 @@ export function Header({ user }: { user: HeaderUser }) {
       </Sheet>
 
       <div className="flex flex-1 items-center gap-x-4">
-        <div className="relative w-full max-w-64">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Buscar membro, célula..."
-            className="w-full rounded-md border border-slate-200 bg-slate-50 pl-9 pr-4 py-2 text-sm outline-none transition-colors focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
+        <SearchCommand />
       </div>
       <div className="flex items-center gap-x-4">
         <button className="relative rounded-full p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all">

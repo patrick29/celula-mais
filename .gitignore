@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# opensquad
+_opensquad/_browser_profile/
+.playwright-mcp/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

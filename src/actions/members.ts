@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { persons, users, churchLifeEvents } from "@/lib/db/schema";
 import { createClient } from "@/lib/supabase/server";
-import { eq, and, ilike, desc, ne } from "drizzle-orm";
+import { eq, and, ilike, desc, asc, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getAuthUserContext } from "@/lib/auth-context";
 import { toActionError, userError, logActionError } from "@/lib/actions/result";
@@ -60,7 +60,7 @@ export async function getMembers(params?: GetMembersParams) {
 
     const membersList = await db.query.persons.findMany({
       where: and(...conditions),
-      orderBy: [desc(persons.createdAt)],
+      orderBy: [asc(persons.fullName)],
       with: {
         churchLifeEvents: {
           orderBy: (events, { desc }) => [desc(events.date)],
