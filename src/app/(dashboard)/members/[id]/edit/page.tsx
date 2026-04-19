@@ -20,26 +20,24 @@ export default async function EditMemberPage({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center gap-4">
+        <Link
+          href="/members"
+          className="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors"
+          title="Voltar para a lista"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Editar Membro</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Editar Membro</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Atualize os dados de {member.fullName} abaixo.
           </p>
         </div>
-        <Link
-          href="/members"
-          className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 disabled:pointer-events-none disabled:opacity-50 border border-slate-200 bg-white shadow-sm hover:bg-slate-100 hover:text-slate-900 h-9 px-4 py-2 gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Voltar
-        </Link>
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 overflow-hidden">
-        <MemberForm member={member as any} allPersons={allPersons ?? []} />
-      </div>
+      <MemberForm member={member as any} allPersons={allPersons ?? []} />
     </div>
   );
 }

@@ -1,4 +1,12 @@
-import { Users, UserPlus, MapPin, TrendingUp, CalendarDays, ArrowRight, Sparkles } from "lucide-react";
+import {
+  Users,
+  UserPlus,
+  MapPin,
+  TrendingUp,
+  CalendarDays,
+  ArrowRight,
+  Grape,
+} from "lucide-react";
 import { db } from "@/lib/db";
 import { cellGroups, persons, visitors, meetings } from "@/lib/db/schema";
 import { getAuthUserContext } from "@/lib/auth-context";
@@ -16,50 +24,55 @@ export default async function DashboardPage() {
   const sevenDaysAgo = subDays(now, 7);
   const sixMonthsAgo = subMonths(now, 6);
 
-  // 1. Total de Células Ativas
   const [cellsCount] = await db
     .select({ value: count() })
     .from(cellGroups)
     .where(and(eq(cellGroups.churchId, churchId), eq(cellGroups.status, "ACTIVE")));
 
-  // 2. Membros e Visitantes Totais
   const [membersCount] = await db
     .select({ value: count() })
     .from(persons)
     .where(and(eq(persons.churchId, churchId), eq(persons.attendsChurch, true)));
 
-  // 3. Novos Visitantes (Última Semana)
   const [newVisitorsCount] = await db
     .select({ value: count() })
     .from(visitors)
     .where(and(eq(visitors.churchId, churchId), gte(visitors.createdAt, sevenDaysAgo)));
 
-  // 4. Frequência Média (Média Simples calculada no JS sobre as últimas reuniões)
   const thirtyDaysAgo = subDays(now, 30);
   const recentMeetings = await db
-    .select({
-      totalCount: meetings.totalCount,
-    })
+    .select({ totalCount: meetings.totalCount })
     .from(meetings)
     .innerJoin(cellGroups, eq(meetings.cellGroupId, cellGroups.id))
-    .where(and(eq(cellGroups.churchId, churchId), gte(meetings.meetingDate, thirtyDaysAgo.toISOString())));
+    .where(
+      and(
+        eq(cellGroups.churchId, churchId),
+        gte(meetings.meetingDate, thirtyDaysAgo.toISOString())
+      )
+    );
 
   let averageAttendance = 0;
   if (recentMeetings.length > 0) {
-    const total = recentMeetings.reduce((acc, curr) => acc + (curr.totalCount || 0), 0);
+    const total = recentMeetings.reduce(
+      (acc, curr) => acc + (curr.totalCount || 0),
+      0
+    );
     averageAttendance = Math.round(total / recentMeetings.length);
   }
 
-  // 5. Dados do Gráfico de Crescimento (Últimos 6 Meses)
   const recentPersons = await db
     .select({ joinedAt: persons.createdAt })
     .from(persons)
-    .where(and(eq(persons.churchId, churchId), gte(persons.createdAt, sixMonthsAgo)));
-    
+    .where(
+      and(eq(persons.churchId, churchId), gte(persons.createdAt, sixMonthsAgo))
+    );
+
   const recentVisitorsList = await db
     .select({ createdAt: visitors.createdAt })
     .from(visitors)
-    .where(and(eq(visitors.churchId, churchId), gte(visitors.createdAt, sixMonthsAgo)));
+    .where(
+      and(eq(visitors.churchId, churchId), gte(visitors.createdAt, sixMonthsAgo))
+    );
 
   const monthsData = Array.from({ length: 6 }).map((_, i) => {
     const date = subMonths(now, 5 - i);
@@ -83,7 +96,6 @@ export default async function DashboardPage() {
     if (monthRecord) monthRecord.visitors += 1;
   });
 
-  // 6. Próximas Reuniões (Cálculo Dinâmico Baseado no Dia da Semana)
   const activeCellGroups = await db
     .select({
       id: cellGroups.id,
@@ -96,8 +108,13 @@ export default async function DashboardPage() {
     .where(and(eq(cellGroups.churchId, churchId), eq(cellGroups.status, "ACTIVE")));
 
   const daysMap: Record<string, number> = {
-    "SUNDAY": 0, "MONDAY": 1, "TUESDAY": 2, "WEDNESDAY": 3,
-    "THURSDAY": 4, "FRIDAY": 5, "SATURDAY": 6,
+    SUNDAY: 0,
+    MONDAY: 1,
+    TUESDAY: 2,
+    WEDNESDAY: 3,
+    THURSDAY: 4,
+    FRIDAY: 5,
+    SATURDAY: 6,
   };
 
   const getNextMeetingDate = (dayStr: string, timeStr: string) => {
@@ -107,14 +124,14 @@ export default async function DashboardPage() {
     const currentDay = today.getDay();
     let daysUntil = targetDay - currentDay;
     if (daysUntil < 0) daysUntil += 7;
-    
+
     const nextDate = new Date();
     nextDate.setDate(today.getDate() + daysUntil);
-    const [hours, mins] = timeStr.split(':');
+    const [hours, mins] = timeStr.split(":");
     if (hours && mins) {
       nextDate.setHours(parseInt(hours), parseInt(mins), 0, 0);
     }
-    
+
     if (daysUntil === 0 && nextDate.getTime() < today.getTime()) {
       nextDate.setDate(nextDate.getDate() + 7);
     }
@@ -122,178 +139,190 @@ export default async function DashboardPage() {
   };
 
   const upcomingMeetings = activeCellGroups
-    .map(cell => ({ ...cell, nextDate: getNextMeetingDate(cell.meetingDay || "", cell.meetingTime || "") }))
-    .filter(cell => cell.nextDate !== null)
-    .sort((a, b) => (a.nextDate!.getTime() - b.nextDate!.getTime()))
+    .map((cell) => ({
+      ...cell,
+      nextDate: getNextMeetingDate(cell.meetingDay || "", cell.meetingTime || ""),
+    }))
+    .filter((cell) => cell.nextDate !== null)
+    .sort((a, b) => a.nextDate!.getTime() - b.nextDate!.getTime())
     .slice(0, 5);
-    
+
+  const firstName = dbUser.fullName?.split(" ")[0] ?? "";
+
+  const kpis = [
+    {
+      label: "Células ativas",
+      value: cellsCount.value,
+      icon: MapPin,
+      hint: "Ramos vivos na rede",
+    },
+    {
+      label: "Membros",
+      value: membersCount.value,
+      icon: Users,
+      hint: "Vidas acompanhadas",
+    },
+    {
+      label: "Novos visitantes",
+      value: newVisitorsCount.value,
+      icon: UserPlus,
+      hint: "Últimos 7 dias",
+    },
+    {
+      label: "Média de presença",
+      value: averageAttendance,
+      icon: TrendingUp,
+      hint: "Por encontro · 30 dias",
+    },
+  ];
+
   return (
-    <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
-      {/* HEADER SECTION */}
+    <div className="p-6 md:p-10 space-y-10 max-w-7xl mx-auto">
+      {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-blue-500 animate-pulse" />
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-700 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">
-              Visão Geral
-            </h1>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+            <Grape className="h-4 w-4 text-[#2d4a2b]" strokeWidth={1.75} />
+            Visão geral
           </div>
-          <p className="text-base text-slate-500 font-medium">Acompanhe o crescimento e a saúde da sua igreja.</p>
+          <h1 className="font-serif text-4xl md:text-[42px] leading-tight text-foreground">
+            {firstName ? `Graça e paz, ${firstName}.` : "Graça e paz com você."}
+          </h1>
+          <p className="text-base text-muted-foreground max-w-xl">
+            Aqui está a videira hoje — cada ramo, cada fruto, cada encontro que
+            faz parte da sua rede.
+          </p>
         </div>
-        <div className="flex items-center text-sm font-medium text-slate-500 bg-white px-4 py-2 rounded-full border shadow-sm">
-          Última atualização: {format(now, "HH:mm")}
-        </div>
-      </div>
-
-      {/* STATS GRID */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Card 1 */}
-        <div className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/60 p-6 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:bg-white/80 transition-all duration-300">
-          <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-500/10 blur-2xl group-hover:bg-blue-500/20 transition-all duration-500"></div>
-          <div className="flex items-start justify-between relative z-10">
-            <div>
-              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Células Ativas</p>
-              <div className="mt-2 flex items-baseline gap-2">
-                <p className="text-4xl font-black text-slate-900 tracking-tight">{cellsCount.value}</p>
-              </div>
-            </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
-              <MapPin className="h-6 w-6" strokeWidth={2.5} />
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2 */}
-        <div className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/60 p-6 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:bg-white/80 transition-all duration-300">
-          <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-emerald-500/10 blur-2xl group-hover:bg-emerald-500/20 transition-all duration-500"></div>
-          <div className="flex items-start justify-between relative z-10">
-            <div>
-              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Membros</p>
-              <div className="mt-2 flex items-baseline gap-2">
-                <p className="text-4xl font-black text-slate-900 tracking-tight">{membersCount.value}</p>
-              </div>
-            </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
-              <Users className="h-6 w-6" strokeWidth={2.5} />
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3 */}
-        <div className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/60 p-6 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:bg-white/80 transition-all duration-300">
-          <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-orange-500/10 blur-2xl group-hover:bg-orange-500/20 transition-all duration-500"></div>
-          <div className="flex items-start justify-between relative z-10">
-            <div>
-              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Novos Visitantes</p>
-              <div className="mt-2 flex items-baseline gap-2">
-                <p className="text-4xl font-black text-slate-900 tracking-tight">{newVisitorsCount.value}</p>
-              </div>
-              <div className="mt-2 flex items-center text-xs font-bold text-orange-600 bg-orange-100/50 w-fit px-2 py-1 rounded-md">
-                <TrendingUp className="mr-1 h-3 w-3" />
-                Na última semana
-              </div>
-            </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform duration-300">
-              <UserPlus className="h-6 w-6" strokeWidth={2.5} />
-            </div>
-          </div>
-        </div>
-
-        {/* Card 4 */}
-        <div className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/60 p-6 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:bg-white/80 transition-all duration-300">
-          <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-500/10 blur-2xl group-hover:bg-purple-500/20 transition-all duration-500"></div>
-          <div className="flex items-start justify-between relative z-10">
-            <div>
-              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Média de Presença</p>
-              <div className="mt-2 flex items-baseline gap-2">
-                <p className="text-4xl font-black text-slate-900 tracking-tight">{averageAttendance}</p>
-                <span className="text-sm font-semibold text-slate-400">/reunião</span>
-              </div>
-            </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform duration-300">
-              <TrendingUp className="h-6 w-6" strokeWidth={2.5} />
-            </div>
-          </div>
+        <div className="flex items-center text-xs font-medium text-muted-foreground bg-card px-3 py-2 rounded-md border border-border">
+          Atualizado às {format(now, "HH:mm")}
         </div>
       </div>
 
-      {/* CHARTS & LISTS GRID */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        {/* CHART WIDGET */}
-        <div className="col-span-4 rounded-2xl border border-slate-200/60 bg-white/80 backdrop-blur-xl shadow-sm flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-300">
-          <div className="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center bg-white/50">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">Crescimento da Igreja</h2>
-              <p className="text-sm font-medium text-slate-500 mt-1">Evolução de membros e visitantes nos últimos 6 meses</p>
+      {/* KPIs */}
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {kpis.map((kpi) => (
+          <div
+            key={kpi.label}
+            className="group rounded-xl border border-border bg-card p-5 transition-all hover:border-[#d4a43c]/50 hover:shadow-sm"
+          >
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                {kpi.label}
+              </p>
+              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[#e5ecdf] text-[#2d4a2b]">
+                <kpi.icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
+              </div>
             </div>
+            <p className="mt-3 font-serif text-4xl leading-none text-foreground">
+              {kpi.value}
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">{kpi.hint}</p>
           </div>
-          <div className="p-6 md:p-8 flex-1 flex flex-col justify-end">
+        ))}
+      </div>
+
+      {/* CHART + AGENDA */}
+      <div className="grid gap-5 lg:grid-cols-7">
+        <div className="lg:col-span-4 rounded-xl border border-border bg-card flex flex-col overflow-hidden">
+          <div className="p-6 border-b border-border">
+            <h2 className="font-serif text-xl text-foreground">
+              Crescimento da videira
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Evolução de membros e visitantes nos últimos 6 meses.
+            </p>
+          </div>
+          <div className="p-6 flex-1">
             <OverviewChart data={monthsData} />
           </div>
         </div>
-        
-        {/* AGENDA WIDGET */}
-        <div className="col-span-3 rounded-2xl border border-slate-200/60 bg-white/80 backdrop-blur-xl shadow-sm flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-300">
-          <div className="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center bg-white/50">
+
+        <div className="lg:col-span-3 rounded-xl border border-border bg-card flex flex-col overflow-hidden">
+          <div className="p-6 border-b border-border flex justify-between items-start">
             <div>
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">Próximas Células</h2>
-              <p className="text-sm font-medium text-slate-500 mt-1">Agenda dos próximos dias</p>
+              <h2 className="font-serif text-xl text-foreground">
+                Próximos encontros
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Onde a videira se reúne em breve.
+              </p>
             </div>
-            <div className="p-3 bg-slate-100 text-slate-500 rounded-full">
-              <CalendarDays className="h-5 w-5" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[#f6ead0] text-[#b88a28]">
+              <CalendarDays className="h-[18px] w-[18px]" strokeWidth={1.75} />
             </div>
           </div>
-          
-          <div className="p-2 flex-1 overflow-y-auto">
-            <div className="flex flex-col gap-2 p-2">
-              {upcomingMeetings.length === 0 ? (
-                <div className="p-12 flex flex-col items-center justify-center text-center">
-                  <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                    <CalendarDays className="h-8 w-8 text-slate-300" />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-700">Agenda Vazia</h3>
-                  <p className="text-sm text-slate-500 max-w-[200px] mt-1">
-                    Nenhuma célula com horário configurado para os próximos dias.
-                  </p>
-                  <Link href="/cells" className="mt-6 text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center group">
-                    Configurar Células 
-                    <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
+
+          <div className="flex-1 overflow-y-auto">
+            {upcomingMeetings.length === 0 ? (
+              <div className="p-10 flex flex-col items-center justify-center text-center">
+                <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center mb-4">
+                  <CalendarDays
+                    className="h-7 w-7 text-muted-foreground"
+                    strokeWidth={1.75}
+                  />
                 </div>
-              ) : (
-                upcomingMeetings.map((cell) => (
-                  <div key={cell.id} className="group relative flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50/80 border border-transparent hover:border-slate-100 transition-all duration-300">
-                    <div className="flex flex-col h-14 w-14 items-center justify-center rounded-xl bg-white shadow-sm border border-slate-200 group-hover:border-blue-200 group-hover:shadow-blue-100 transition-all">
-                      <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">{format(cell.nextDate!, "MMM", { locale: ptBR })}</span>
-                      <span className="text-lg font-black text-slate-800 leading-none mt-1">{format(cell.nextDate!, "dd")}</span>
+                <h3 className="font-serif text-lg text-foreground">
+                  Agenda silenciosa
+                </h3>
+                <p className="text-sm text-muted-foreground max-w-[220px] mt-1">
+                  Nenhum encontro agendado ainda. Marque o próximo momento de
+                  comunhão.
+                </p>
+                <Link
+                  href="/cells"
+                  className="mt-5 text-sm font-medium text-[#2d4a2b] hover:text-[#6b2d3f] inline-flex items-center group/link"
+                >
+                  Configurar células
+                  <ArrowRight
+                    className="ml-1 h-4 w-4 group-hover/link:translate-x-0.5 transition-transform"
+                    strokeWidth={1.75}
+                  />
+                </Link>
+              </div>
+            ) : (
+              <div className="divide-y divide-border">
+                {upcomingMeetings.map((cell) => (
+                  <div
+                    key={cell.id}
+                    className="group flex items-center gap-4 p-5 hover:bg-muted/40 transition-colors"
+                  >
+                    <div className="flex flex-col h-14 w-14 items-center justify-center rounded-md border border-border bg-background">
+                      <span className="text-[10px] font-medium text-[#6b2d3f] uppercase tracking-[0.1em]">
+                        {format(cell.nextDate!, "MMM", { locale: ptBR })}
+                      </span>
+                      <span className="font-serif text-xl text-foreground leading-none mt-0.5">
+                        {format(cell.nextDate!, "dd")}
+                      </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-base font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors" title={cell.name}>{cell.name}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                          {format(cell.nextDate!, "EEEE • HH:mm", { locale: ptBR }).replace(/^\w/, c => c.toUpperCase())}
-                        </span>
-                      </div>
+                      <p
+                        className="text-sm font-medium text-foreground truncate"
+                        title={cell.name}
+                      >
+                        {cell.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {format(cell.nextDate!, "EEEE • HH:mm", {
+                          locale: ptBR,
+                        }).replace(/^\w/, (c) => c.toUpperCase())}
+                      </p>
                       {cell.addressLine && (
-                        <p className="text-xs font-medium text-slate-500 truncate mt-2 flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
+                        <p className="text-xs text-muted-foreground truncate mt-1 flex items-center gap-1">
+                          <MapPin
+                            className="h-3 w-3"
+                            strokeWidth={1.75}
+                          />
                           {cell.addressLine}
                         </p>
                       )}
                     </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
-                        <ArrowRight className="h-4 w-4" />
-                      </div>
-                    </div>
                   </div>
-                ))
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
-

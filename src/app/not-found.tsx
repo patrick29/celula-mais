@@ -8,7 +8,7 @@ export default function RootNotFound() {
     <ErrorScreen
       variant="fullscreen"
       icon={MapPinOff}
-      iconColorClassName="text-slate-400"
+      iconColorClassName="text-muted-foreground"
       title="Não encontramos essa página"
       description="A página que você procura pode ter sido movida ou não existe mais. Vamos voltar para o começo?"
       primaryAction={{

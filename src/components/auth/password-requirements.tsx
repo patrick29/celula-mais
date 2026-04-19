@@ -36,13 +36,13 @@ export function PasswordRequirements({ value }: PasswordRequirementsProps) {
           key={item.label}
           className={cn(
             "flex items-center gap-1.5 transition-colors",
-            item.ok ? "text-emerald-600" : "text-slate-400"
+            item.ok ? "text-[#2d4a2b]" : "text-muted-foreground"
           )}
         >
           {item.ok ? (
-            <Check className="h-3.5 w-3.5" />
+            <Check className="h-3.5 w-3.5" strokeWidth={1.75} />
           ) : (
-            <X className="h-3.5 w-3.5" />
+            <X className="h-3.5 w-3.5" strokeWidth={1.75} />
           )}
           {item.label}
         </li>

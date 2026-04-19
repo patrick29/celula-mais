@@ -100,26 +100,26 @@ export function AddVisitorDialog({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/50 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-xl shadow-2xl border border-border w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-semibold text-slate-900">Adicionar Visitante</h3>
+          <h3 className="font-semibold text-foreground">Adicionar Visitante</h3>
           <button
             onClick={handleClose}
-            className="p-1 hover:bg-slate-100 rounded-full text-slate-500 transition-colors"
+            className="p-1 hover:bg-muted rounded-full text-muted-foreground transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="p-4 space-y-4">
-          <div className="flex p-1 bg-slate-100 rounded-lg">
+          <div className="flex p-1 bg-muted rounded-lg">
             <button
               onClick={() => setMode("search")}
               className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all ${
                 mode === "search"
-                  ? "bg-white text-indigo-600 shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white text-[#2d4a2b] shadow-sm"
+                  : "text-foreground hover:text-foreground"
               }`}
             >
               <Search className="w-4 h-4" />
@@ -129,8 +129,8 @@ export function AddVisitorDialog({
               onClick={() => setMode("create")}
               className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all ${
                 mode === "create"
-                  ? "bg-white text-indigo-600 shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white text-[#2d4a2b] shadow-sm"
+                  : "text-foreground hover:text-foreground"
               }`}
             >
               <UserPlus className="w-4 h-4" />
@@ -141,20 +141,20 @@ export function AddVisitorDialog({
           {mode === "search" ? (
             <div className="space-y-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   autoFocus
                   type="text"
                   placeholder="Buscar por nome..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 bg-muted/60 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                 />
               </div>
 
               <div className="max-h-60 overflow-y-auto space-y-1 pr-1">
                 {loading ? (
-                  <div className="py-8 flex flex-col items-center justify-center gap-2 text-slate-400">
+                  <div className="py-8 flex flex-col items-center justify-center gap-2 text-muted-foreground">
                     <Loader2 className="w-6 h-6 animate-spin" />
                     <span className="text-xs">Carregando pessoas...</span>
                   </div>
@@ -166,20 +166,20 @@ export function AddVisitorDialog({
                         onSuccess(person);
                         handleClose();
                       }}
-                      className="w-full flex items-center justify-between p-3 hover:bg-indigo-50 text-left rounded-lg group transition-colors border border-transparent hover:border-indigo-100"
+                      className="w-full flex items-center justify-between p-3 hover:bg-[#e5ecdf] text-left rounded-lg group transition-colors border border-transparent hover:border-[#e5ecdf]"
                     >
-                      <span className="text-sm font-medium text-slate-700 group-hover:text-indigo-700">
+                      <span className="text-sm font-medium text-foreground group-hover:text-[#2d4a2b]">
                         {person.fullName}
                       </span>
-                      <Check className="w-4 h-4 text-indigo-600 opacity-0 group-hover:opacity-100" />
+                      <Check className="w-4 h-4 text-[#2d4a2b] opacity-0 group-hover:opacity-100" />
                     </button>
                   ))
                 ) : (
-                  <div className="py-8 text-center text-slate-400">
+                  <div className="py-8 text-center text-muted-foreground">
                     <p className="text-sm">Nenhuma pessoa encontrada.</p>
                     <button
                       onClick={() => setMode("create")}
-                      className="text-xs text-indigo-600 font-medium hover:underline mt-1"
+                      className="text-xs text-[#2d4a2b] font-medium hover:underline mt-1"
                     >
                       Cadastrar novo visitante
                     </button>
@@ -190,7 +190,7 @@ export function AddVisitorDialog({
           ) : (
             <div className="space-y-4 py-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-foreground">
                   Nome Completo
                 </label>
                 <input
@@ -199,12 +199,12 @@ export function AddVisitorDialog({
                   placeholder="Nome do visitante"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent"
+                  className="w-full px-4 py-2 bg-muted/60 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-foreground">
                   Apelido (Opcional)
                 </label>
                 <input
@@ -212,14 +212,14 @@ export function AddVisitorDialog({
                   placeholder="Ex: Marquinhos"
                   value={newNickname}
                   onChange={(e) => setNewNickname(e.target.value)}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent"
+                  className="w-full px-4 py-2 bg-muted/60 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                 />
               </div>
 
               <button
                 disabled={!newName.trim() || submitting}
                 onClick={handleCreate}
-                className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary hover:bg-[#3a5e36] text-white rounded-lg text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
                 {submitting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

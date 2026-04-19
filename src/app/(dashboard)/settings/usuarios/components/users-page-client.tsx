@@ -68,10 +68,10 @@ export function UsersPageClient({
     <div className="p-6 space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Usuários
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Cadastre e gerencie quem pode acessar a plataforma da sua igreja.
           </p>
         </div>
@@ -86,7 +86,7 @@ export function UsersPageClient({
       </header>
 
       {loadError ? (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <div className="rounded-lg border border-[#ebe3cf] bg-[#f6ead0] p-4 text-sm text-[#b88a28]">
           {loadError}
         </div>
       ) : (

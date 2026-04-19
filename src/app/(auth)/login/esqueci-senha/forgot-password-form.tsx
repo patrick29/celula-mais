@@ -40,15 +40,15 @@ export function ForgotPasswordForm() {
 
   if (sent) {
     return (
-      <Card className="p-6 space-y-4 text-center shadow-sm">
+      <Card className="p-6 space-y-4 text-center">
         <div className="flex justify-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-            <Mail className="h-6 w-6" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#e5ecdf] text-[#2d4a2b] border border-[#ebe3cf]">
+            <Mail className="h-6 w-6" strokeWidth={1.75} />
           </div>
         </div>
         <div className="space-y-1">
-          <h2 className="text-lg font-bold text-slate-800">Verifique seu email</h2>
-          <p className="text-sm text-slate-500">
+          <h2 className="font-serif text-xl text-foreground">Verifique seu email</h2>
+          <p className="text-sm text-muted-foreground">
             Se o email estiver cadastrado, enviamos um link para criar uma nova
             senha. O link vale por 1 hora.
           </p>
@@ -61,10 +61,10 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <Card className="p-6 space-y-5 shadow-sm">
+    <Card className="p-6 space-y-5">
       <div className="space-y-1 text-center">
-        <h2 className="text-xl font-bold text-slate-800">Recuperar acesso</h2>
-        <p className="text-sm text-slate-500">
+        <h2 className="font-serif text-xl text-foreground">Recuperar acesso</h2>
+        <p className="text-sm text-muted-foreground">
           Informe o email cadastrado. Enviaremos um link para você criar uma
           nova senha.
         </p>
@@ -94,7 +94,7 @@ export function ForgotPasswordForm() {
         <div className="text-center">
           <Link
             href="/login"
-            className="text-xs font-semibold text-slate-500 hover:text-slate-700 hover:underline"
+            className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline"
           >
             ← Voltar para o login
           </Link>

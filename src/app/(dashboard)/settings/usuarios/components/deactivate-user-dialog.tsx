@@ -45,8 +45,8 @@ export function DeactivateUserDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="flex justify-center mb-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-600">
-              <AlertTriangle className="h-6 w-6" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f6ead0] text-[#b88a28] border border-[#ebe3cf]">
+              <AlertTriangle className="h-6 w-6" strokeWidth={1.75} />
             </div>
           </div>
           <DialogTitle className="text-center">Desativar acesso?</DialogTitle>

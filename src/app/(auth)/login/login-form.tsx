@@ -63,11 +63,11 @@ export function LoginForm({ expired }: { expired: boolean }) {
   };
 
   return (
-    <Card className="p-6 space-y-5 shadow-sm">
+    <Card className="p-6 space-y-5">
       <div className="space-y-1 text-center">
-        <h2 className="text-xl font-bold text-slate-800">Entrar no Célula Mais</h2>
-        <p className="text-sm text-slate-500">
-          Acesse sua área como pastor, supervisor ou líder
+        <h2 className="font-serif text-2xl text-foreground">Entre na videira</h2>
+        <p className="text-sm text-muted-foreground">
+          Acesse como pastor, supervisor ou líder
         </p>
       </div>
 
@@ -94,7 +94,7 @@ export function LoginForm({ expired }: { expired: boolean }) {
             <Label htmlFor="password">Senha</Label>
             <Link
               href="/login/esqueci-senha"
-              className="text-xs font-semibold text-blue-600 hover:underline"
+              className="text-xs font-medium text-[#6b2d3f] hover:underline"
             >
               Esqueci minha senha
             </Link>

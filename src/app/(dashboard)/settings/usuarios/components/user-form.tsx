@@ -216,7 +216,7 @@ function CreateForm({
         <PasswordRequirements value={initialPassword} />
       </Field>
 
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-muted-foreground">
         O usuário receberá o email e a senha por um canal privado seu. No
         primeiro acesso, será obrigado a definir uma senha pessoal.
       </p>
@@ -294,7 +294,7 @@ function EditForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <Field id="emailReadonly" label="Email">
         <Input id="emailReadonly" value={user.email} disabled readOnly />
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           O email é usado para login e não pode ser alterado.
         </p>
       </Field>

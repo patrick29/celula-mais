@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Clock, CalendarDays, User } from "lucide-react";
+import { Home, Clock, CalendarDays, User, Grape } from "lucide-react";
 import Link from "next/link";
 import { deleteCellGroup } from "@/actions/cell-groups";
 import { useRouter } from "next/navigation";
@@ -25,11 +25,30 @@ const cellGroupTypeLabels: Record<string, string> = {
   ADULTS: "Adultos",
 };
 
-const statusConfig: Record<string, { label: string; color: string; dot: string }> = {
-  ACTIVE: { label: "Ativa", color: "text-emerald-600", dot: "bg-emerald-500" },
-  PLANTING: { label: "Em Plantio", color: "text-blue-600", dot: "bg-blue-500" },
-  PAUSED: { label: "Pausada", color: "text-amber-600", dot: "bg-amber-500" },
-  CLOSED: { label: "Encerrada", color: "text-slate-500", dot: "bg-slate-400" },
+const statusConfig: Record<
+  string,
+  { label: string; color: string; dot: string }
+> = {
+  ACTIVE: {
+    label: "Ativa",
+    color: "text-[#2d4a2b]",
+    dot: "bg-[#3f7d4e]",
+  },
+  PLANTING: {
+    label: "Em plantio",
+    color: "text-[#b88a28]",
+    dot: "bg-[#d4a43c]",
+  },
+  PAUSED: {
+    label: "Pausada",
+    color: "text-[#b88a28]",
+    dot: "bg-[#e2b859]",
+  },
+  CLOSED: {
+    label: "Encerrada",
+    color: "text-muted-foreground",
+    dot: "bg-muted-foreground",
+  },
 };
 
 export function CellGroupsTable({ cellGroups }: { cellGroups: CellGroup[] }) {
@@ -37,7 +56,12 @@ export function CellGroupsTable({ cellGroups }: { cellGroups: CellGroup[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm(`Tem certeza que deseja excluir a célula "${name}"? Esta ação não pode ser desfeita.`)) return;
+    if (
+      !confirm(
+        `Tem certeza que deseja remover a célula "${name}"? Esta ação não pode ser desfeita.`
+      )
+    )
+      return;
 
     setDeletingId(id);
     try {
@@ -51,7 +75,9 @@ export function CellGroupsTable({ cellGroups }: { cellGroups: CellGroup[] }) {
       toast.success("Célula removida");
       router.refresh();
     } catch {
-      toast.error("Não foi possível concluir esta ação. Tente novamente em instantes.");
+      toast.error(
+        "Não foi possível concluir esta ação. Tente novamente em instantes."
+      );
     } finally {
       setDeletingId(null);
     }
@@ -59,107 +85,160 @@ export function CellGroupsTable({ cellGroups }: { cellGroups: CellGroup[] }) {
 
   if (cellGroups.length === 0) {
     return (
-      <div className="text-center p-12 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col items-center justify-center">
-        <Home className="w-12 h-12 text-slate-300 mb-4" />
-        <h3 className="text-lg font-medium text-slate-900">Nenhuma célula encontrada</h3>
-        <p className="text-sm text-slate-500 mt-1 max-w-sm">
-          Você ainda não tem células cadastradas. Clique em "Nova Célula" para começar.
+      <div className="text-center p-12 bg-card rounded-xl border border-border flex flex-col items-center justify-center">
+        <div className="w-14 h-14 rounded-full bg-[#e5ecdf] flex items-center justify-center mb-4">
+          <Grape className="w-7 h-7 text-[#2d4a2b]" strokeWidth={1.75} />
+        </div>
+        <h3 className="font-serif text-lg text-foreground">
+          Ainda não há ramos nesta videira
+        </h3>
+        <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+          Plante a primeira célula para começar a acompanhar encontros e
+          frutos.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="bg-slate-50 border-b border-slate-200 text-slate-600">
+          <thead className="bg-muted/60 border-b border-border text-muted-foreground">
             <tr>
-              <th className="px-6 py-4 font-medium">Célula</th>
-              <th className="px-6 py-4 font-medium">Tipo</th>
-              <th className="px-6 py-4 font-medium">Líder</th>
-              <th className="px-6 py-4 font-medium">Reunião</th>
-              <th className="px-6 py-4 font-medium">Status</th>
-              <th className="px-6 py-4 font-medium text-right">Ações</th>
+              <th className="px-6 py-3 font-medium text-[11px] uppercase tracking-[0.1em]">
+                Célula
+              </th>
+              <th className="px-6 py-3 font-medium text-[11px] uppercase tracking-[0.1em]">
+                Tipo
+              </th>
+              <th className="px-6 py-3 font-medium text-[11px] uppercase tracking-[0.1em]">
+                Líder
+              </th>
+              <th className="px-6 py-3 font-medium text-[11px] uppercase tracking-[0.1em]">
+                Encontro
+              </th>
+              <th className="px-6 py-3 font-medium text-[11px] uppercase tracking-[0.1em]">
+                Status
+              </th>
+              <th className="px-6 py-3 font-medium text-[11px] uppercase tracking-[0.1em] text-right">
+                Ações
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200">
+          <tbody className="divide-y divide-border">
             {cellGroups.map((cellGroup) => {
-              const status = statusConfig[cellGroup.status] ?? statusConfig.ACTIVE;
+              const status =
+                statusConfig[cellGroup.status] ?? statusConfig.ACTIVE;
               return (
-                <tr key={cellGroup.id} className="hover:bg-slate-50/50 transition-colors">
+                <tr
+                  key={cellGroup.id}
+                  className="hover:bg-muted/40 transition-colors"
+                >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 text-blue-600">
-                        <Home className="w-5 h-5" />
+                      <div className="w-10 h-10 rounded-lg bg-[#e5ecdf] flex items-center justify-center flex-shrink-0 text-[#2d4a2b] border border-[#ebe3cf]">
+                        <Home className="w-5 h-5" strokeWidth={1.75} />
                       </div>
                       <div>
-                        <div className="font-medium text-slate-900">{cellGroup.name}</div>
+                        <div className="font-medium text-foreground">
+                          {cellGroup.name}
+                        </div>
                         {cellGroup.neighborhood && (
-                          <div className="text-xs text-slate-500">{cellGroup.neighborhood}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {cellGroup.neighborhood}
+                          </div>
                         )}
                       </div>
                     </div>
                   </td>
 
                   <td className="px-6 py-4">
-                    <span className="text-sm text-slate-700">
-                      {cellGroupTypeLabels[cellGroup.cellGroupType] ?? cellGroup.cellGroupType}
+                    <span className="text-sm text-foreground">
+                      {cellGroupTypeLabels[cellGroup.cellGroupType] ??
+                        cellGroup.cellGroupType}
                     </span>
                   </td>
 
                   <td className="px-6 py-4">
                     {cellGroup.leaderName ? (
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <User className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="text-sm">{cellGroup.leaderName}</span>
+                      <div className="flex items-center gap-2 text-foreground">
+                        <User
+                          className="w-3.5 h-3.5 text-muted-foreground"
+                          strokeWidth={1.75}
+                        />
+                        <span className="text-sm">
+                          {cellGroup.leaderName}
+                        </span>
                       </div>
                     ) : (
-                      <span className="text-xs text-slate-400 italic">Sem líder definido</span>
+                      <span className="text-xs text-muted-foreground italic">
+                        Sem líder definido
+                      </span>
                     )}
                   </td>
 
                   <td className="px-6 py-4">
                     <div className="space-y-1">
                       {cellGroup.meetingDay && (
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
-                          <span className="text-xs">{cellGroup.meetingDay}</span>
+                        <div className="flex items-center gap-2 text-foreground">
+                          <CalendarDays
+                            className="w-3.5 h-3.5 text-muted-foreground"
+                            strokeWidth={1.75}
+                          />
+                          <span className="text-xs">
+                            {cellGroup.meetingDay}
+                          </span>
                         </div>
                       )}
                       {cellGroup.meetingTime && (
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <Clock className="w-3.5 h-3.5 text-slate-400" />
-                          <span className="text-xs">{cellGroup.meetingTime}</span>
+                        <div className="flex items-center gap-2 text-foreground">
+                          <Clock
+                            className="w-3.5 h-3.5 text-muted-foreground"
+                            strokeWidth={1.75}
+                          />
+                          <span className="text-xs">
+                            {cellGroup.meetingTime}
+                          </span>
                         </div>
                       )}
                       {!cellGroup.meetingDay && !cellGroup.meetingTime && (
-                        <span className="text-xs text-slate-400 italic">Não definido</span>
+                        <span className="text-xs text-muted-foreground italic">
+                          Não definido
+                        </span>
                       )}
                     </div>
                   </td>
 
                   <td className="px-6 py-4">
-                    <span className={`text-xs inline-flex items-center gap-1 ${status.color}`}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${status.dot}`}></div>
+                    <span
+                      className={`text-xs inline-flex items-center gap-1.5 ${status.color}`}
+                    >
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${status.dot}`}
+                      />
                       {status.label}
                     </span>
                   </td>
 
                   <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-3">
+                    <div className="flex items-center justify-end gap-4">
                       <Link
                         href={`/cells/${cellGroup.id}/edit`}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        className="text-[#2d4a2b] hover:text-[#6b2d3f] text-sm font-medium transition-colors"
                       >
                         Editar
                       </Link>
                       <button
-                        onClick={() => handleDelete(cellGroup.id, cellGroup.name)}
+                        onClick={() =>
+                          handleDelete(cellGroup.id, cellGroup.name)
+                        }
                         disabled={deletingId === cellGroup.id}
-                        className="text-red-500 hover:text-red-700 text-sm font-medium disabled:opacity-50"
+                        className="text-destructive hover:text-destructive/80 text-sm font-medium disabled:opacity-50 transition-colors"
                       >
-                        {deletingId === cellGroup.id ? "Excluindo..." : "Excluir"}
+                        {deletingId === cellGroup.id
+                          ? "Removendo…"
+                          : "Remover"}
                       </button>
                     </div>
                   </td>

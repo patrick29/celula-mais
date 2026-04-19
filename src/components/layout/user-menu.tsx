@@ -45,35 +45,35 @@ export function UserMenu({
         <button
           type="button"
           disabled={isPending}
-          className="flex items-center gap-x-2 ml-2 border-l pl-4 hover:opacity-80 transition-opacity disabled:opacity-50"
+          className="flex items-center gap-x-3 ml-2 border-l border-border pl-4 hover:opacity-80 transition-opacity disabled:opacity-50"
         >
-          <div className="flex flex-col text-right">
-            <span className="text-sm font-semibold text-slate-900 leading-tight">
+          <div className="hidden md:flex flex-col text-right">
+            <span className="text-sm font-medium text-foreground leading-tight">
               {fullName}
             </span>
-            <span className="text-xs text-slate-500 leading-tight">
+            <span className="text-xs text-muted-foreground leading-tight">
               {roleLabel(role)}
             </span>
           </div>
-          <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200">
-            {initials || <UserIcon className="h-4 w-4" />}
+          <div className="h-9 w-9 rounded-full bg-[#e5ecdf] flex items-center justify-center text-[#2d4a2b] font-medium text-sm border border-[#ebe3cf]">
+            {initials || <UserIcon className="h-4 w-4" strokeWidth={1.75} />}
           </div>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-56">
         <DropdownMenuLabel>
           <div className="flex flex-col gap-0.5">
-            <span className="text-sm font-semibold text-slate-900">
+            <span className="text-sm font-medium text-foreground">
               {fullName}
             </span>
-            <span className="text-xs text-slate-500 font-normal">{email}</span>
+            <span className="text-xs text-muted-foreground font-normal">{email}</span>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleSignOut}
           disabled={isPending}
-          className="text-red-600 focus:text-red-700"
+          className="text-destructive focus:text-destructive"
         >
           <LogOut className="h-4 w-4" />
           {isPending ? "Saindo…" : "Sair"}

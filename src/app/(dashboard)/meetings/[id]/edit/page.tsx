@@ -41,13 +41,13 @@ export default async function EditMeetingPage({ params }: EditMeetingPageProps) 
       <div className="flex items-center gap-4">
         <Link
           href="/meetings"
-          className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500"
+          className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Editar Reunião</h1>
-          <p className="text-sm text-slate-500 mt-1">Atualize os dados e a frequência da reunião.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Editar Reunião</h1>
+          <p className="text-sm text-muted-foreground mt-1">Atualize os dados e a frequência da reunião.</p>
         </div>
       </div>
 

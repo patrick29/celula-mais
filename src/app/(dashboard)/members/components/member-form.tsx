@@ -202,7 +202,7 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
           {/* ── Dados Pessoais ── */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-slate-900">
+              <CardTitle className="text-lg font-semibold text-foreground">
                 Dados Pessoais
               </CardTitle>
             </CardHeader>
@@ -320,13 +320,13 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
           {showSpouse && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg font-semibold text-slate-900">
+                <CardTitle className="text-lg font-semibold text-foreground">
                   Cônjuge
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Toggle modo */}
-                <div className="flex bg-slate-100 p-1 rounded-lg w-fit">
+                <div className="flex bg-muted p-1 rounded-lg w-fit">
                   <Button
                     type="button"
                     variant={spouseMode === "select" ? "default" : "ghost"}
@@ -389,7 +389,7 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
                     )}
                   </div>
                 ) : (
-                  <div className="bg-slate-50 border border-slate-200 rounded-md p-4 space-y-4">
+                  <div className="bg-muted/60 border border-border rounded-md p-4 space-y-4">
                     <p className="text-xs text-muted-foreground">
                       Preencha apenas o nome para cadastrar o cônjuge rapidamente.
                     </p>
@@ -438,7 +438,7 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
           {/* ── Endereço ── */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-slate-900">
+              <CardTitle className="text-lg font-semibold text-foreground">
                 Endereço
               </CardTitle>
             </CardHeader>
@@ -475,7 +475,7 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
           {/* ── Vida na Igreja ── */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-semibold text-slate-900">
+              <CardTitle className="text-lg font-semibold text-foreground">
                 Vida na Igreja
               </CardTitle>
               <Button
@@ -497,21 +497,21 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
                   {fields.map((field: any, index) => (
                     <div
                       key={field.id}
-                      className="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200 transition-colors hover:bg-slate-100"
+                      className="flex items-center justify-between bg-muted/60 p-3 rounded-lg border border-border transition-colors hover:bg-muted"
                     >
                       <input type="hidden" {...register(`churchLifeEvents.${index}.type` as const)} />
                       <input type="hidden" {...register(`churchLifeEvents.${index}.date` as const)} />
                       <input type="hidden" {...register(`churchLifeEvents.${index}.notes` as const)} />
                       
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-white rounded-full shadow-sm text-blue-600">
+                        <div className="p-2 bg-white rounded-full shadow-sm text-[#2d4a2b]">
                           <Calendar className="w-4 h-4" />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                          <p className="text-sm font-semibold text-foreground flex items-center gap-2">
                             {getFriendlyEventTitle(field.type)}
                             {(field as any).isNew && (
-                              <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase">
+                              <span className="bg-[#e5ecdf] text-[#2d4a2b] text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase">
                                 Novo
                               </span>
                             )}
@@ -527,7 +527,7 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
                         variant="ghost"
                         size="icon"
                         onClick={() => remove(index)}
-                        className="text-slate-400 hover:text-destructive hover:bg-destructive/10 h-8 w-8"
+                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -535,7 +535,7 @@ export function MemberForm({ member, allPersons = [] }: MemberFormProps) {
                   ))}
 
                   {fields.length === 0 && (
-                    <div className="col-span-full py-10 text-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50/50">
+                    <div className="col-span-full py-10 text-center border-2 border-dashed border-border rounded-lg bg-muted/40">
                       <p className="text-sm text-muted-foreground font-medium">
                         Nenhum evento lançado no histórico.
                       </p>

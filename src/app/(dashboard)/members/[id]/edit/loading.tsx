@@ -11,7 +11,7 @@ export default function EditMemberLoading() {
         <Skeleton className="h-9 w-24 rounded-md" />
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 overflow-hidden space-y-8">
+      <div className="bg-white rounded-lg border border-border shadow-sm p-6 overflow-hidden space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Skeleton className="h-4 w-24" />

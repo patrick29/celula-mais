@@ -4,23 +4,23 @@ import type { UserRole } from "@/lib/auth-context";
 const ROLE_STYLES: Record<UserRole, { label: string; className: string }> = {
   ADMIN: {
     label: "Administrador",
-    className: "bg-purple-100 text-purple-700 ring-purple-200",
+    className: "bg-[#f3dee4] text-[#6b2d3f] ring-[#f3dee4]",
   },
   PASTOR: {
     label: "Pastor",
-    className: "bg-blue-100 text-blue-700 ring-blue-200",
+    className: "bg-[#e5ecdf] text-[#2d4a2b] ring-[#e5ecdf]",
   },
   SUPERVISOR: {
     label: "Supervisor",
-    className: "bg-emerald-100 text-emerald-700 ring-emerald-200",
+    className: "bg-[#e5ecdf] text-[#3a5e36] ring-[#e5ecdf]",
   },
   LEADER: {
     label: "Líder",
-    className: "bg-amber-100 text-amber-700 ring-amber-200",
+    className: "bg-[#f6ead0] text-[#b88a28] ring-[#f6ead0]",
   },
   ASSISTANT: {
     label: "Assistente",
-    className: "bg-slate-100 text-slate-700 ring-slate-200",
+    className: "bg-[#f5f1e6] text-[#4a433d] ring-[#ebe3cf]",
   },
 };
 
@@ -29,7 +29,7 @@ export function UserRoleBadge({ role }: { role: UserRole }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset",
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset",
         style.className
       )}
     >

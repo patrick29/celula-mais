@@ -105,27 +105,27 @@ export function ResetPasswordForm({ first }: { first: boolean }) {
 
   if (sessionState === "loading") {
     return (
-      <Card className="p-6 space-y-4 shadow-sm">
-        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200" />
-        <div className="h-10 w-full animate-pulse rounded bg-slate-200" />
-        <div className="h-10 w-full animate-pulse rounded bg-slate-200" />
+      <Card className="p-6 space-y-4">
+        <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+        <div className="h-10 w-full animate-pulse rounded bg-muted" />
+        <div className="h-10 w-full animate-pulse rounded bg-muted" />
       </Card>
     );
   }
 
   if (sessionState === "invalid") {
     return (
-      <Card className="p-6 space-y-4 text-center shadow-sm">
+      <Card className="p-6 space-y-4 text-center">
         <div className="flex justify-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-600">
-            <AlertTriangle className="h-6 w-6" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f6ead0] text-[#b88a28] border border-[#ebe3cf]">
+            <AlertTriangle className="h-6 w-6" strokeWidth={1.75} />
           </div>
         </div>
         <div className="space-y-1">
-          <h2 className="text-lg font-bold text-slate-800">
+          <h2 className="font-serif text-xl text-foreground">
             Link inválido ou expirado
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             Este link não é mais válido. Os links de recuperação duram 1 hora
             por segurança.
           </p>
@@ -145,10 +145,10 @@ export function ResetPasswordForm({ first }: { first: boolean }) {
   const passwordOk = isValidPassword(newPassword);
 
   return (
-    <Card className="p-6 space-y-5 shadow-sm">
+    <Card className="p-6 space-y-5">
       <div className="space-y-1 text-center">
-        <h2 className="text-xl font-bold text-slate-800">Definir nova senha</h2>
-        <p className="text-sm text-slate-500">
+        <h2 className="font-serif text-xl text-foreground">Definir nova senha</h2>
+        <p className="text-sm text-muted-foreground">
           {first
             ? "Este é seu primeiro acesso. Defina uma senha pessoal antes de continuar."
             : "Crie uma senha forte para sua conta."}

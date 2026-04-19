@@ -55,7 +55,7 @@ function renderAction(action: ErrorScreenAction, isPrimary: boolean) {
 
 export function ErrorScreen({
   icon: Icon,
-  iconColorClassName = "text-amber-500",
+  iconColorClassName = "text-[#d4a43c]",
   title,
   description,
   primaryAction,
@@ -66,7 +66,7 @@ export function ErrorScreen({
 }: ErrorScreenProps) {
   const outerClassName =
     variant === "fullscreen"
-      ? "flex min-h-screen items-center justify-center px-6 bg-gradient-to-br from-slate-50 to-white"
+      ? "flex min-h-screen items-center justify-center px-6 bg-muted/40"
       : "flex min-h-[60vh] items-center justify-center px-6";
 
   return (
@@ -75,8 +75,8 @@ export function ErrorScreen({
         <div className="flex justify-center mb-5">
           <Icon className={`h-12 w-12 ${iconColorClassName}`} aria-hidden />
         </div>
-        <h1 className="text-2xl font-semibold text-slate-800 mb-3">{title}</h1>
-        <p className="text-sm text-slate-600 leading-relaxed mb-6">
+        <h1 className="text-2xl font-semibold text-foreground mb-3">{title}</h1>
+        <p className="text-sm text-foreground leading-relaxed mb-6">
           {description}
         </p>
         <div className="flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
@@ -84,12 +84,12 @@ export function ErrorScreen({
           {renderAction(primaryAction, true)}
         </div>
         {digest ? (
-          <p className="mt-6 text-xs text-slate-400">Código do erro: {digest}</p>
+          <p className="mt-6 text-xs text-muted-foreground">Código do erro: {digest}</p>
         ) : null}
         {process.env.NODE_ENV !== "production" && devErrorMessage ? (
-          <details className="mt-6 text-left text-xs text-slate-500">
+          <details className="mt-6 text-left text-xs text-muted-foreground">
             <summary className="cursor-pointer">Detalhes técnicos (dev)</summary>
-            <pre className="mt-2 whitespace-pre-wrap break-words rounded-lg bg-slate-100 p-3 text-[11px] text-slate-700">
+            <pre className="mt-2 whitespace-pre-wrap break-words rounded-lg bg-muted p-3 text-[11px] text-foreground">
               {devErrorMessage}
             </pre>
           </details>

@@ -65,7 +65,7 @@ export function ChurchEventDialog({ isOpen, onClose, onSuccess }: ChurchEventDia
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-blue-100 rounded-md text-blue-600">
+            <div className="p-1.5 bg-[#e5ecdf] rounded-md text-[#2d4a2b]">
               <Calendar className="w-4 h-4" />
             </div>
             <DialogTitle>Lançar Novo Evento</DialogTitle>
@@ -74,7 +74,7 @@ export function ChurchEventDialog({ isOpen, onClose, onSuccess }: ChurchEventDia
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-100 text-red-600 rounded-lg text-sm">
+            <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -127,7 +127,7 @@ export function ChurchEventDialog({ isOpen, onClose, onSuccess }: ChurchEventDia
             <Button
               type="submit"
               disabled={!type || !date}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-primary hover:bg-[#3a5e36] text-white"
             >
               <Plus className="w-4 h-4 mr-2" />
               Adicionar Evento

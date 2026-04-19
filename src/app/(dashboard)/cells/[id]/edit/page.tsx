@@ -25,14 +25,14 @@ export default async function EditCellGroupPage({ params }: EditCellGroupPagePro
       <div className="flex items-center gap-4">
         <Link
           href="/cells"
-          className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors"
+          className="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors"
           title="Voltar para a lista"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Editar Célula</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Editar Célula</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Atualize os dados da célula <strong>{cellGroup.name}</strong>.
           </p>
         </div>

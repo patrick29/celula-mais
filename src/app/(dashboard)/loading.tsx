@@ -32,8 +32,8 @@ export default function DashboardLoading() {
       {/* CHARTS & LISTS GRID */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         {/* CHART WIDGET */}
-        <div className="col-span-4 rounded-2xl border border-slate-200/60 bg-white/80 shadow-sm overflow-hidden text-slate-400">
-          <div className="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center bg-white/50">
+        <div className="col-span-4 rounded-2xl border border-border/60 bg-white/80 shadow-sm overflow-hidden text-muted-foreground">
+          <div className="p-6 md:p-8 border-b border-border flex justify-between items-center bg-white/50">
             <div className="space-y-2">
               <Skeleton className="h-7 w-56" />
               <Skeleton className="h-4 w-72" />
@@ -45,8 +45,8 @@ export default function DashboardLoading() {
         </div>
         
         {/* AGENDA WIDGET */}
-        <div className="col-span-3 rounded-2xl border border-slate-200/60 bg-white/80 shadow-sm overflow-hidden">
-          <div className="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center bg-white/50">
+        <div className="col-span-3 rounded-2xl border border-border/60 bg-white/80 shadow-sm overflow-hidden">
+          <div className="p-6 md:p-8 border-b border-border flex justify-between items-center bg-white/50">
             <div className="space-y-2">
               <Skeleton className="h-7 w-48" />
               <Skeleton className="h-4 w-56" />

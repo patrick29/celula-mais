@@ -73,12 +73,12 @@ export function UsersTable({
 
   if (users.length === 0) {
     return (
-      <div className="text-center p-12 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col items-center justify-center">
-        <UsersIcon className="w-12 h-12 text-slate-300 mb-4" />
-        <h3 className="text-lg font-medium text-slate-900">
+      <div className="text-center p-12 bg-white rounded-lg border border-border shadow-sm flex flex-col items-center justify-center">
+        <UsersIcon className="w-12 h-12 text-muted-foreground/60 mb-4" />
+        <h3 className="text-lg font-medium text-foreground">
           Nenhum usuário cadastrado
         </h3>
-        <p className="text-sm text-slate-500 mt-1 max-w-sm">
+        <p className="text-sm text-muted-foreground mt-1 max-w-sm">
           Comece cadastrando o primeiro usuário para dar acesso à plataforma.
         </p>
         <Button onClick={onCreateFirst} className="mt-4">
@@ -92,7 +92,7 @@ export function UsersTable({
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por nome ou email"
             value={search}
@@ -131,10 +131,10 @@ export function UsersTable({
         </Select>
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg border border-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-600">
+            <thead className="bg-muted/60 border-b border-border text-foreground">
               <tr>
                 <th className="px-6 py-4 font-medium">Usuário</th>
                 <th className="px-6 py-4 font-medium">Perfil</th>
@@ -144,12 +144,12 @@ export function UsersTable({
                 <th className="px-6 py-4 font-medium text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-border">
               {filtered.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
-                    className="px-6 py-10 text-center text-sm text-slate-500"
+                    className="px-6 py-10 text-center text-sm text-muted-foreground"
                   >
                     Nenhum usuário encontrado com os filtros atuais.
                   </td>
@@ -166,18 +166,18 @@ export function UsersTable({
                   return (
                     <tr
                       key={user.id}
-                      className="hover:bg-slate-50/50 transition-colors"
+                      className="hover:bg-muted/40 transition-colors"
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200">
+                          <div className="h-10 w-10 rounded-full bg-[#e5ecdf] flex items-center justify-center text-[#2d4a2b] font-bold border border-[#ebe3cf]">
                             {initials || "?"}
                           </div>
                           <div>
-                            <div className="font-medium text-slate-900">
+                            <div className="font-medium text-foreground">
                               {user.fullName}
                             </div>
-                            <div className="text-xs text-slate-500">
+                            <div className="text-xs text-muted-foreground">
                               {user.email}
                             </div>
                           </div>
@@ -188,17 +188,17 @@ export function UsersTable({
                       </td>
                       <td className="px-6 py-4">
                         {user.supervisorName ? (
-                          <span className="text-sm text-slate-700">
+                          <span className="text-sm text-foreground">
                             {user.supervisorName}
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-400 italic">
+                          <span className="text-xs text-muted-foreground italic">
                             Sem supervisor
                           </span>
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-sm text-slate-600">
+                        <span className="text-sm text-foreground">
                           {formatDate(user.lastLoginAt)}
                         </span>
                       </td>
@@ -206,13 +206,13 @@ export function UsersTable({
                         <span
                           className={`text-xs inline-flex items-center gap-1.5 ${
                             user.isActive
-                              ? "text-emerald-600"
-                              : "text-slate-500"
+                              ? "text-[#3f7d4e]"
+                              : "text-muted-foreground"
                           }`}
                         >
                           <span
                             className={`h-1.5 w-1.5 rounded-full ${
-                              user.isActive ? "bg-emerald-500" : "bg-slate-400"
+                              user.isActive ? "bg-[#3f7d4e]" : "bg-muted-foreground"
                             }`}
                           />
                           {user.isActive ? "Ativo" : "Inativo"}
@@ -224,7 +224,7 @@ export function UsersTable({
                             <button
                               type="button"
                               disabled={isPending}
-                              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-50"
                               aria-label={`Ações para ${user.fullName}`}
                             >
                               <MoreHorizontal className="h-4 w-4" />
@@ -244,7 +244,7 @@ export function UsersTable({
                             {user.isActive ? (
                               <DropdownMenuItem
                                 onClick={() => onDeactivate(user)}
-                                className="text-red-600 focus:text-red-700"
+                                className="text-destructive focus:text-destructive/80"
                               >
                                 Desativar acesso
                               </DropdownMenuItem>

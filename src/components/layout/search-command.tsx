@@ -74,19 +74,19 @@ export function SearchCommand() {
 
   return (
     <div ref={containerRef} className="relative w-full max-w-64">
-      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
       <input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => { if (query.length >= 2) setIsOpen(true); }}
         onKeyDown={handleKeyDown}
-        placeholder="Buscar membro, célula..."
-        className="w-full rounded-md border border-slate-200 bg-slate-50 pl-9 pr-4 py-2 text-sm outline-none transition-colors focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"
+        placeholder="Buscar em tudo…"
+        className="w-full rounded-md border border-border bg-background pl-9 pr-4 py-2 text-sm outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30 placeholder:text-muted-foreground"
       />
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-full rounded-md border bg-white shadow-lg z-50 overflow-hidden">
+        <div className="absolute top-full left-0 mt-1 w-full rounded-md border border-border bg-popover shadow-md z-50 overflow-hidden">
           {isLoading && (
             <div className="p-3 space-y-2">
               <Skeleton className="h-4 w-3/4" />
@@ -96,13 +96,13 @@ export function SearchCommand() {
           )}
 
           {!isLoading && error && (
-            <div className="px-3 py-4 text-sm text-red-500 text-center">
+            <div className="px-3 py-4 text-sm text-destructive text-center">
               {error}
             </div>
           )}
 
           {!isLoading && !error && isEmpty && (
-            <div className="px-3 py-4 text-sm text-slate-500 text-center">
+            <div className="px-3 py-4 text-sm text-muted-foreground text-center">
               Nenhum resultado encontrado para &ldquo;{query}&rdquo;
             </div>
           )}
@@ -111,16 +111,16 @@ export function SearchCommand() {
             <>
               {hasMembers && (
                 <div>
-                  <div className="px-3 py-1.5 text-xs font-semibold text-slate-400">
+                  <div className="px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
                     Membros
                   </div>
                   {results.members.map((member) => (
                     <button
                       key={member.id}
                       onClick={() => navigate(`/members/${member.id}/edit`)}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"
                     >
-                      <Users className="h-4 w-4 text-slate-400 shrink-0" />
+                      <Users className="h-4 w-4 text-muted-foreground shrink-0" strokeWidth={1.75} />
                       <span className="truncate">{member.fullName}</span>
                     </button>
                   ))}
@@ -128,21 +128,21 @@ export function SearchCommand() {
               )}
 
               {hasMembers && hasCells && (
-                <div className="mx-1 my-1 h-px bg-slate-200" />
+                <div className="mx-1 my-1 h-px bg-border" />
               )}
 
               {hasCells && (
                 <div>
-                  <div className="px-3 py-1.5 text-xs font-semibold text-slate-400">
+                  <div className="px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
                     Células
                   </div>
                   {results.cells.map((cell) => (
                     <button
                       key={cell.id}
                       onClick={() => navigate(`/cells/${cell.id}/edit`)}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"
                     >
-                      <Home className="h-4 w-4 text-slate-400 shrink-0" />
+                      <Home className="h-4 w-4 text-muted-foreground shrink-0" strokeWidth={1.75} />
                       <span className="truncate">{cell.name}</span>
                     </button>
                   ))}

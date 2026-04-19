@@ -14,9 +14,9 @@ export function Toaster(props: ToasterProps) {
       toastOptions={{
         classNames: {
           toast:
-            "rounded-2xl border border-white/40 bg-white/90 backdrop-blur-xl shadow-md",
-          title: "text-sm font-medium text-slate-800",
-          description: "text-xs text-slate-600",
+            "rounded-lg border border-border bg-card shadow-md",
+          title: "text-sm font-medium text-foreground",
+          description: "text-xs text-muted-foreground",
         },
       }}
       {...props}

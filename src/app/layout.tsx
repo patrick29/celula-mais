@@ -1,15 +1,26 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
+import { DM_Sans, Lora, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const dmSans = DM_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const lora = Lora({
+  variable: "--font-serif",
   subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -25,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${plusJakartaSans.variable} ${geistMono.variable} font-sans antialiased`}
+        className={`${dmSans.variable} ${lora.variable} ${jetBrainsMono.variable} font-sans antialiased`}
       >
         {children}
       </body>

@@ -17,7 +17,12 @@ export function MembersTable({ members }: { members: Member[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm(`Tem certeza que deseja excluir o membro "${name}"? Esta ação não pode ser desfeita.`)) return;
+    if (
+      !confirm(
+        `Tem certeza que deseja remover o membro "${name}"? Esta ação não pode ser desfeita.`
+      )
+    )
+      return;
 
     setDeletingId(id);
     try {
@@ -31,7 +36,9 @@ export function MembersTable({ members }: { members: Member[] }) {
       toast.success("Membro removido");
       router.refresh();
     } catch {
-      toast.error("Não foi possível concluir esta ação. Tente novamente em instantes.");
+      toast.error(
+        "Não foi possível concluir esta ação. Tente novamente em instantes."
+      );
     } finally {
       setDeletingId(null);
     }
@@ -39,41 +46,63 @@ export function MembersTable({ members }: { members: Member[] }) {
 
   if (members.length === 0) {
     return (
-      <div className="text-center p-12 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col items-center justify-center">
-        <User className="w-12 h-12 text-slate-300 mb-4" />
-        <h3 className="text-lg font-medium text-slate-900">Nenhum membro encontrado</h3>
-        <p className="text-sm text-slate-500 mt-1 max-w-sm">
-          Você ainda não tem membros cadastrados nesta igreja. Clique no botão "Novo Membro" para começar.
+      <div className="text-center p-12 bg-card rounded-xl border border-border flex flex-col items-center justify-center">
+        <div className="w-14 h-14 rounded-full bg-[#e5ecdf] flex items-center justify-center mb-4">
+          <User className="w-7 h-7 text-[#2d4a2b]" strokeWidth={1.75} />
+        </div>
+        <h3 className="font-serif text-lg text-foreground">
+          Ninguém por aqui ainda
+        </h3>
+        <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+          Acolha o primeiro membro da sua rede para começar a cuidar de cada
+          vida.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="bg-slate-50 border-b border-slate-200 text-slate-600">
+          <thead className="bg-muted/60 border-b border-border text-muted-foreground">
             <tr>
-              <th className="px-6 py-4 font-medium">Nome</th>
-              <th className="px-6 py-4 font-medium">Contato</th>
-              <th className="px-6 py-4 font-medium">Status</th>
-              <th className="px-6 py-4 font-medium text-right">Ações</th>
+              <th className="px-6 py-3 font-medium text-[11px] uppercase tracking-[0.1em]">
+                Nome
+              </th>
+              <th className="px-6 py-3 font-medium text-[11px] uppercase tracking-[0.1em]">
+                Contato
+              </th>
+              <th className="px-6 py-3 font-medium text-[11px] uppercase tracking-[0.1em]">
+                Status
+              </th>
+              <th className="px-6 py-3 font-medium text-[11px] uppercase tracking-[0.1em] text-right">
+                Ações
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200">
+          <tbody className="divide-y divide-border">
             {members.map((member) => (
-              <tr key={member.id} className="hover:bg-slate-50/50 transition-colors">
+              <tr
+                key={member.id}
+                className="hover:bg-muted/40 transition-colors"
+              >
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-500">
-                      <User className="w-5 h-5" />
+                    <div className="w-10 h-10 rounded-full bg-[#e5ecdf] flex items-center justify-center flex-shrink-0 text-[#2d4a2b] border border-[#ebe3cf]">
+                      <User className="w-5 h-5" strokeWidth={1.75} />
                     </div>
                     <div>
-                      <div className="font-medium text-slate-900">{member.fullName}</div>
+                      <div className="font-medium text-foreground">
+                        {member.fullName}
+                      </div>
                       {member.gender && (
-                        <div className="text-xs text-slate-500">
-                          {member.gender === "MALE" ? "Masculino" : member.gender === "FEMALE" ? "Feminino" : "Outro"}
+                        <div className="text-xs text-muted-foreground">
+                          {member.gender === "MALE"
+                            ? "Masculino"
+                            : member.gender === "FEMALE"
+                            ? "Feminino"
+                            : "Outro"}
                         </div>
                       )}
                     </div>
@@ -82,8 +111,11 @@ export function MembersTable({ members }: { members: Member[] }) {
                 <td className="px-6 py-4">
                   <div className="space-y-1">
                     {member.phone && (
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <Phone className="w-3.5 h-3.5 text-slate-400" />
+                      <div className="flex items-center gap-2 text-foreground">
+                        <Phone
+                          className="w-3.5 h-3.5 text-muted-foreground"
+                          strokeWidth={1.75}
+                        />
                         <span className="text-xs">{member.phone}</span>
                       </div>
                     )}
@@ -92,36 +124,45 @@ export function MembersTable({ members }: { members: Member[] }) {
 
                 <td className="px-6 py-4">
                   <div className="flex flex-col gap-1">
-                    {Array.isArray(member.churchLifeEvents) && member.churchLifeEvents.some((e: any) => e.type === 'BATISMO') ? (
-                      <span className="text-xs inline-flex items-center gap-1 text-emerald-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Batizado
+                    {Array.isArray(member.churchLifeEvents) &&
+                    member.churchLifeEvents.some(
+                      (e: any) => e.type === "BATISMO"
+                    ) ? (
+                      <span className="text-xs inline-flex items-center gap-1.5 text-[#2d4a2b]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#3f7d4e]" />
+                        Batizado
                       </span>
                     ) : (
-                      <span className="text-xs inline-flex items-center gap-1 text-slate-500">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div> Não batizado
+                      <span className="text-xs inline-flex items-center gap-1.5 text-muted-foreground">
+                        <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
+                        Não batizado
                       </span>
                     )}
-                    {Array.isArray(member.churchLifeEvents) && member.churchLifeEvents.some((e: any) => e.type === 'MEMBRO') && (
-                      <span className="text-xs inline-flex items-center gap-1 text-blue-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Membro Ativo
-                      </span>
-                    )}
+                    {Array.isArray(member.churchLifeEvents) &&
+                      member.churchLifeEvents.some(
+                        (e: any) => e.type === "MEMBRO"
+                      ) && (
+                        <span className="text-xs inline-flex items-center gap-1.5 text-[#6b2d3f]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#6b2d3f]" />
+                          Membro ativo
+                        </span>
+                      )}
                   </div>
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-3">
-                    <Link 
+                  <div className="flex items-center justify-end gap-4">
+                    <Link
                       href={`/members/${member.id}/edit`}
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      className="text-[#2d4a2b] hover:text-[#6b2d3f] text-sm font-medium transition-colors"
                     >
                       Editar
                     </Link>
                     <button
                       onClick={() => handleDelete(member.id, member.fullName)}
                       disabled={deletingId === member.id}
-                      className="text-red-500 hover:text-red-700 text-sm font-medium disabled:opacity-50"
+                      className="text-destructive hover:text-destructive/80 text-sm font-medium disabled:opacity-50 transition-colors"
                     >
-                      {deletingId === member.id ? "Excluindo..." : "Excluir"}
+                      {deletingId === member.id ? "Removendo…" : "Remover"}
                     </button>
                   </div>
                 </td>

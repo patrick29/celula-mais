@@ -22,7 +22,7 @@ interface MeetingFormProps {
 }
 
 const inputClass =
-  "w-full flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50";
+  "w-full flex h-10 rounded-md border border-border bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50";
 
 const EMPTY_MEMBERS: { id: string; fullName: string }[] = [];
 
@@ -246,10 +246,10 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
   }
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 overflow-hidden">
+    <div className="bg-white rounded-lg border border-border shadow-sm p-6 overflow-hidden">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
+          <div className="p-4 bg-destructive/10 border border-destructive/30 text-destructive rounded-md text-sm">
             {error}
           </div>
         )}
@@ -257,11 +257,11 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
         <div className="space-y-6">
           {/* Informações da Reunião */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-slate-900 border-b pb-2">Dados da Reunião</h3>
+            <h3 className="font-semibold text-foreground border-b pb-2">Dados da Reunião</h3>
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Célula *</label>
+                  <label className="text-sm font-medium text-foreground">Célula *</label>
                   <select {...register("cellGroupId")} className={inputClass}>
                     <option value="">Selecione a célula...</option>
                     {cellGroups.map((c) => (
@@ -270,17 +270,17 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
                       </option>
                     ))}
                   </select>
-                  {errors.cellGroupId && <p className="text-xs text-red-500">{errors.cellGroupId.message}</p>}
+                  {errors.cellGroupId && <p className="text-xs text-destructive">{errors.cellGroupId.message}</p>}
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Data da Reunião *</label>
+                  <label className="text-sm font-medium text-foreground">Data da Reunião *</label>
                   <input type="date" {...register("meetingDate")} className={inputClass} />
-                  {errors.meetingDate && <p className="text-xs text-red-500">{errors.meetingDate.message}</p>}
+                  {errors.meetingDate && <p className="text-xs text-destructive">{errors.meetingDate.message}</p>}
                 </div>
               </div>
 
-              <div className="flex flex-col items-center justify-center pt-4 border-t border-slate-50">
+              <div className="flex flex-col items-center justify-center pt-4 border-t border-border">
                 <ImageUpload 
                   value={meeting?.photoUrl} 
                   onChange={setSelectedFile}
@@ -291,16 +291,16 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
           </div>
 
           {/* Visitantes */}
-          <div className="space-y-4 pt-4 border-t border-slate-100">
+          <div className="space-y-4 pt-4 border-t border-border">
             <div className="flex items-center justify-between border-b pb-2">
-              <h3 className="font-semibold text-slate-900 flex items-center gap-2">
-                <UserPlus className="w-4 h-4 text-blue-600" />
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <UserPlus className="w-4 h-4 text-[#2d4a2b]" />
                 Visitantes Individuais
               </h3>
               <button
                 type="button"
                 onClick={() => setIsVisitorDialogOpen(true)}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-all border border-blue-200"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2d4a2b] hover:text-[#3a5e36] bg-[#e5ecdf] hover:bg-[#e5ecdf] px-3 py-1.5 rounded-md transition-all border border-[#ebe3cf]"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 Adicionar Visitante
@@ -310,12 +310,12 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
             {visitorDetails.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {visitorDetails.map((visitor) => (
-                  <div key={visitor.id} className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg group">
-                    <span className="text-sm font-medium text-slate-700">{visitor.fullName}</span>
+                  <div key={visitor.id} className="flex items-center justify-between p-2.5 bg-muted/60 border border-border rounded-lg group">
+                    <span className="text-sm font-medium text-foreground">{visitor.fullName}</span>
                     <button
                       type="button"
                       onClick={() => removeVisitor(visitor.id)}
-                      className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                      className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full transition-colors"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -323,36 +323,36 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-400 italic py-2 text-center border border-dashed rounded-lg border-slate-200">
+              <p className="text-sm text-muted-foreground italic py-2 text-center border border-dashed rounded-lg border-border">
                 Nenhum visitante individual adicionado.
               </p>
             )}
           </div>
 
           {/* Controle de Presença */}
-          <div className="space-y-4 pt-4 border-t border-slate-100">
+          <div className="space-y-4 pt-4 border-t border-border">
             <div className="flex items-center justify-between border-b pb-2">
-              <h3 className="font-semibold text-slate-900 flex items-center gap-2">
-                <Users className="w-4 h-4 text-indigo-600" />
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <Users className="w-4 h-4 text-[#2d4a2b]" />
                 Chamada de Membros
               </h3>
               <div className="flex gap-2">
-                <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full">
+                <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 bg-[#e5ecdf] text-[#2d4a2b] rounded-full">
                   {selectedPersonIds.length} Membros
                 </span>
-                <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">
+                <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 bg-[#e5ecdf] text-[#2d4a2b] rounded-full">
                   {visitorDetails.length} Visitantes
                 </span>
               </div>
             </div>
             
             {!cellGroupId ? (
-              <div className="py-12 border-2 border-dashed border-slate-100 rounded-lg text-center bg-slate-50/50">
-                <p className="text-sm text-slate-400">Selecione uma célula para ver os integrantes</p>
+              <div className="py-12 border-2 border-dashed border-border rounded-lg text-center bg-muted/40">
+                <p className="text-sm text-muted-foreground">Selecione uma célula para ver os integrantes</p>
               </div>
             ) : loadingMembers ? (
               <div className="py-12 flex justify-center items-center">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#2d4a2b]" />
               </div>
             ) : (
               <DualListSelector
@@ -370,11 +370,11 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
           </div>
 
           {/* Dinâmica da Reunião */}
-          <div className="space-y-4 pt-4 border-t border-slate-100">
-            <h3 className="font-semibold text-slate-900 border-b pb-2">Dinâmica da Reunião</h3>
+          <div className="space-y-4 pt-4 border-t border-border">
+            <h3 className="font-semibold text-foreground border-b pb-2">Dinâmica da Reunião</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-slate-700">Tópico / Estudo</label>
+                <label className="text-sm font-medium text-foreground">Tópico / Estudo</label>
                 <input
                   {...register("topic")}
                   className={inputClass}
@@ -383,7 +383,7 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Oração Inicial</label>
+                <label className="text-sm font-medium text-foreground">Oração Inicial</label>
                 <Controller
                   control={control}
                   name="initialPrayer"
@@ -406,7 +406,7 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Oração Final</label>
+                <label className="text-sm font-medium text-foreground">Oração Final</label>
                 <Controller
                   control={control}
                   name="finalPrayer"
@@ -429,7 +429,7 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-slate-700">Reflexão (Palavra)</label>
+                <label className="text-sm font-medium text-foreground">Reflexão (Palavra)</label>
                 <Controller
                   control={control}
                   name="responsibleForReflection"
@@ -452,7 +452,7 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-slate-700">Observações</label>
+                <label className="text-sm font-medium text-foreground">Observações</label>
                 <textarea
                   {...register("notes")}
                   className={inputClass + " h-24 resize-none"}
@@ -464,17 +464,17 @@ export function MeetingForm({ meeting, cellGroups, initialCellMembers = EMPTY_ME
 
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
+        <div className="flex items-center justify-end gap-3 pt-6 border-t border-border">
           <Link
             href="/meetings"
-            className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-foreground hover:text-foreground bg-white border border-border rounded-md hover:bg-muted/60 transition-colors"
           >
             Cancelar
           </Link>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center justify-center gap-2 px-6 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center gap-2 px-6 py-2 text-sm font-medium text-white bg-primary hover:bg-[#3a5e36] rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <Loader2 className="w-4 h-4 animate-spin" />

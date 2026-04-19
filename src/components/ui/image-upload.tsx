@@ -48,7 +48,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
           flex flex-col items-center justify-center gap-2
           border-2 border-dashed rounded-xl overflow-hidden
           w-full aspect-video max-w-md
-          ${preview ? "border-transparent" : "border-slate-300 hover:border-indigo-400 bg-slate-50 hover:bg-slate-100"}
+          ${preview ? "border-transparent" : "border-border hover:border-[#3a5e36] bg-muted/60 hover:bg-muted"}
           ${disabled ? "opacity-50 cursor-not-allowed" : ""}
         `}
       >
@@ -65,18 +65,18 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
                 e.stopPropagation();
                 handleClear();
               }}
-              className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg"
+              className="absolute top-2 right-2 p-1.5 bg-destructive text-white rounded-full hover:bg-destructive/80 transition-colors shadow-lg"
             >
               <X className="w-4 h-4" />
             </button>
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center p-6 text-slate-500 text-center">
-            <div className="p-3 mb-2 rounded-full bg-white border border-slate-200 shadow-sm">
-              <Upload className="w-6 h-6 text-indigo-600" />
+          <div className="flex flex-col items-center justify-center p-6 text-muted-foreground text-center">
+            <div className="p-3 mb-2 rounded-full bg-white border border-border shadow-sm">
+              <Upload className="w-6 h-6 text-[#2d4a2b]" />
             </div>
-            <p className="text-sm font-semibold text-slate-700">Foto da Reunião</p>
-            <p className="text-xs text-slate-500 mt-1">Clique para selecionar (Max. 5MB)</p>
+            <p className="text-sm font-semibold text-foreground">Foto da Reunião</p>
+            <p className="text-xs text-muted-foreground mt-1">Clique para selecionar (Max. 5MB)</p>
           </div>
         )}
       </div>
